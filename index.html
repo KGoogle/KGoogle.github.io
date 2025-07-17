@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>암호(아님) 변환기</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --body-bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #333;
+            --input-bg: #252525;
+            --input-readonly-bg: #1a1a1a;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--container-bg);
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .converter-section {
+            margin-bottom: 25px;
+        }
+
+        .converter-section:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 1em;
+            font-family: inherit;
+            box-sizing: border-box;
+            resize: none;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        textarea::placeholder {
+            color: #777;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #e0e0e0;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        textarea[readonly] {
+            background-color: var(--input-readonly-bg);
+            color: var(--text-secondary);
+            cursor: default;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        button {
+            flex-grow: 1;
+            padding: 12px 15px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white;
+            background-color: #333;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: #444;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .copy-btn {
+            background-color: #495057;
+            flex-grow: 0;
+            padding: 0 15px;
+        }
+
+        .copy-btn:hover {
+            background-color: #343a40;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>암호 변환기</h1>
+        <p class="description">
+            <strong style="color: #ccc;">[인코딩 규칙]</strong><br>
+            각 음절 ('가'~'힣')은 유니코드 순서에 따라 0~11171의 고유한 인덱스를 갖습니다.<br>
+            ( 인덱스=(초성 번호×21×28)+(중성 번호×28)+종성 번호 )<br>
+            정보 손실을 막기 위해 인덱스에 1을 더한 1~11172 범위의 값을 사용합니다. <br>
+            ( v<sub>i</sub> = 인덱스+1 )<br>
+            이 값을 0이 없는 11172진법의 자릿값으로 하여 문자열을 하나의 10진수로 변환합니다.<br>
+            <span style="display:inline-block; margin-left: 1em;">
+                ( 숫자 = v₁ × 11172ⁿ⁻¹ + v₂ × 11172ⁿ⁻² + ⋯ + vₙ × 11172⁰ = ∑<sub>i=1</sub><sup>n</sup>
+                v<sub>i</sub>×11172<sup>n−i</sup> )<br>
+
+                <strong style="color: #ccc;">[디코딩 규칙]</strong><br>
+                인코딩된 숫자 N으로부터 복원된 음절들은 추출 순서의 역순으로 정렬하여 문자열을 만듭니다.<br>
+                인코딩 시 더해진 1을 보정하기 위해, N에서 1을 뺀 값을 11172로 나눕니다.<br>
+                이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신하며 이 과정을 반복합니다.<br>
+
+                <span style="display:inline-block; margin-left: 1em;">
+                    반복: N > 0인 동안<br>
+                       보정 값 = N - 1<br>
+                       인덱스 = 보정 값 mod 11172<br>
+                       음절 = chr(0xAC00 + 인덱스)<br>
+                       N = 보정 값 ÷ 11172 (정수 나눗셈)<br>
+                </span>
+
+                <div class="converter-section">
+                    <label for="hangul-input">한글 입력 (인코딩)</label>
+                    <div class="input-group">
+                        <textarea id="hangul-input" placeholder="여기에 한글을 입력하세요."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button id="encode-btn">숫자로 변환</button>
+                    </div>
+                    <label for="number-output" style="margin-top: 15px;">결과 (숫자)</label>
+                    <div class="input-group">
+                        <textarea id="number-output" readonly placeholder="변환된 숫자가 여기에 표시됩니다."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="copy-btn" data-target="number-output">결과 복사</button>
+                    </div>
+                </div>
+
+
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+
+                <div class="converter-section">
+                    <label for="number-input">숫자 입력 (디코딩)</label>
+                    <div class="input-group">
+                        <textarea id="number-input" placeholder="여기에 숫자를 입력하세요."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button id="decode-btn">한글로 변환</button>
+                    </div>
+                    <label for="hangul-output" style="margin-top: 15px;">결과 (한글)</label>
+                    <div class="input-group">
+                        <textarea id="hangul-output" readonly placeholder="복원된 한글이 여기에 표시됩니다."></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="copy-btn" data-target="hangul-output">결과 복사</button>
+                    </div>
+                </div>
+
+                <footer>
+                    <p>PYH</p>
+                </footer>
+    </div>
+
+    <script>
+        const hangulInput = document.getElementById('hangul-input');
+        const numberOutput = document.getElementById('number-output');
+        const encodeBtn = document.getElementById('encode-btn');
+
+        const numberInput = document.getElementById('number-input');
+        const hangulOutput = document.getElementById('hangul-output');
+        const decodeBtn = document.getElementById('decode-btn');
+
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        const allButtons = document.querySelectorAll('button');
+
+        const HANGUL_BASE = 44032n;
+        const HANGUL_COUNT = 11172n;
+        
+        const DIGITAL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%*?';
+
+        function progressiveScrambleEffect(targetElement, finalText, type) {
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            let revealedCount = 0;
+            const totalLength = finalText.length;
+            
+            if (totalLength === 0) {
+                targetElement.value = '';
+                allButtons.forEach(btn => btn.disabled = false);
+                return;
+            }
+
+            const DURATION_TOTAL = 800;
+            let intervalTime = DURATION_TOTAL / totalLength;
+            intervalTime = Math.max(20, Math.min(100, intervalTime));
+
+            let intervalId = setInterval(() => {
+                revealedCount++;
+                const revealedPart = finalText.substring(0, revealedCount);
+                
+                let scrambledPart = '';
+                for (let i = revealedCount; i < totalLength; i++) {
+                    if (type === 'number') {
+                        const randomChars = '0123456789';
+                        scrambledPart += randomChars[Math.floor(Math.random() * randomChars.length)];
+                    } else {
+                        scrambledPart += DIGITAL_CHARS[Math.floor(Math.random() * DIGITAL_CHARS.length)];
+                    }
+                }
+
+                targetElement.value = revealedPart + scrambledPart;
+
+                if (revealedCount >= totalLength) {
+                    clearInterval(intervalId);
+                    targetElement.value = finalText;
+                    allButtons.forEach(btn => btn.disabled = false);
+                }
+            }, intervalTime);
+        }
+
+        function encodeHangul(text) {
+            if (!text) return '';
+            let result = 0n;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const charCode = BigInt(char.charCodeAt(0));
+                if (charCode < HANGUL_BASE || charCode >= HANGUL_BASE + HANGUL_COUNT) {
+                    alert(`오류: '${char}'는 변환할 수 없는 문자입니다.\n'가'부터 '힣'까지의 한글만 입력해주세요.`);
+                    return null;
+                }
+                const value = (charCode - HANGUL_BASE) + 1n;
+                result = result * HANGUL_COUNT + value;
+            }
+            return result.toLocaleString('en-US');
+        }
+
+        function decodeNumber(numStr) {
+            if (!numStr.trim()) return '';
+            try {
+                const cleanNumStr = numStr.replace(/,/g, '');
+                let num = BigInt(cleanNumStr);
+                if (num < 0n) throw new Error("음수는 변환할 수 없습니다.");
+                if (num === 0n) throw new Error("0은 변환할 수 없습니다.");
+                let result = '';
+                while (num > 0n) {
+                    const remainder = (num - 1n) % HANGUL_COUNT;
+                    const charCode = remainder + HANGUL_BASE;
+                    result = String.fromCharCode(Number(charCode)) + result;
+                    num = (num - 1n) / HANGUL_COUNT;
+                }
+                return result;
+            } catch (e) {
+                alert("오류: 올바른 숫자 형식이 아니거나 변환할 수 없는 값입니다.\n양수만 입력해주세요.");
+                return null;
+            }
+        }
+
+        encodeBtn.addEventListener('click', () => {
+            const finalResult = encodeHangul(hangulInput.value);
+            if (finalResult !== null) {
+                progressiveScrambleEffect(numberOutput, finalResult, 'number');
+            }
+        });
+
+        decodeBtn.addEventListener('click', () => {
+            const finalResult = decodeNumber(numberInput.value);
+            if (finalResult !== null) {
+                progressiveScrambleEffect(hangulOutput, finalResult, 'hangul');
+            }
+        });
+
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.dataset.target;
+                const targetTextarea = document.getElementById(targetId);
+                if (targetTextarea.value) {
+                    navigator.clipboard.writeText(targetTextarea.value).then(() => {
+                        const originalText = btn.textContent;
+                        btn.textContent = '복사 완료!';
+                        setTimeout(() => { btn.textContent = originalText; }, 1500);
+                    }).catch(err => { alert('복사에 실패했습니다.'); });
+                } else {
+                    alert('복사할 내용이 없습니다.');
+                }
+            });
+        });
+
+        hangulInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                encodeBtn.click();
+            }
+        });
+
+        numberInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                decodeBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
