@@ -166,64 +166,64 @@
             정보 손실을 막기 위해 인덱스에 1을 더한 1~11172 범위의 값을 사용합니다. <br>
             ( v<sub>i</sub> = 인덱스+1 )<br>
             이 값을 0이 없는 11172진법의 자릿값으로 하여 문자열을 하나의 10진수로 변환합니다.<br>
-            <span style="display:inline-block; margin-left: 1em;">
+            <span style="display:inline-block; text-align: left;">
                 ( 숫자 = v₁ × 11172ⁿ⁻¹ + v₂ × 11172ⁿ⁻² + ⋯ + vₙ × 11172⁰ = ∑<sub>i=1</sub><sup>n</sup>
-                v<sub>i</sub>×11172<sup>n−i</sup> )<br>
+                v<sub>i</sub>×11172<sup>n−i</sup> )
+            </span><br>
 
-                <strong style="color: #ccc;">[디코딩 규칙]</strong><br>
-                인코딩된 숫자 N으로부터 복원된 음절들은 추출 순서의 역순으로 정렬하여 문자열을 만듭니다.<br>
-                인코딩 시 더해진 1을 보정하기 위해, N에서 1을 뺀 값을 11172로 나눕니다.<br>
-                이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신하며 이 과정을 반복합니다.<br>
+            <strong style="color: #ccc;">[디코딩 규칙]</strong><br>
+            인코딩된 숫자 N으로부터 복원된 음절들은 추출 순서의 역순으로 정렬하여 문자열을 만듭니다.<br>
+            인코딩 시 더해진 1을 보정하기 위해, N에서 1을 뺀 값을 11172로 나눕니다.<br>
+            이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신하며 이 과정을 반복합니다.<br>
 
-                <span style="display:inline-block; margin-left: 1em;">
-                    반복: N > 0인 동안<br>
-                       보정 값 = N - 1<br>
-                       인덱스 = 보정 값 mod 11172<br>
-                       음절 = chr(0xAC00 + 인덱스)<br>
-                       N = 보정 값 ÷ 11172 (정수 나눗셈)<br>
-                </span>
+            <span style="display:inline-block; text-align: left;">
+                   반복: N > 0인 동안<br>
+                   보정 값 = N - 1<br>
+                   인덱스 = 보정 값 mod 11172<br>
+                   음절 = chr(0xAC00 + 인덱스)<br>
+                   N = 보정 값 ÷ 11172 (정수 나눗셈)<br>
+            </span>
+        </p>
 
-                <div class="converter-section">
-                    <label for="hangul-input">한글 입력 (인코딩)</label>
-                    <div class="input-group">
-                        <textarea id="hangul-input" placeholder="여기에 한글을 입력하세요."></textarea>
-                    </div>
-                    <div class="button-group">
-                        <button id="encode-btn">숫자로 변환</button>
-                    </div>
-                    <label for="number-output" style="margin-top: 15px;">결과 (숫자)</label>
-                    <div class="input-group">
-                        <textarea id="number-output" readonly placeholder="변환된 숫자가 여기에 표시됩니다."></textarea>
-                    </div>
-                    <div class="button-group">
-                        <button class="copy-btn" data-target="number-output">결과 복사</button>
-                    </div>
-                </div>
+        <div class="converter-section">
+            <label for="hangul-input">한글 입력 (인코딩)</label>
+            <div class="input-group">
+                <textarea id="hangul-input" placeholder="여기에 한글을 입력하세요."></textarea>
+            </div>
+            <div class="button-group">
+                <button id="encode-btn">숫자로 변환</button>
+            </div>
+            <label for="number-output" style="margin-top: 15px;">결과 (숫자)</label>
+            <div class="input-group">
+                <textarea id="number-output" readonly placeholder="변환된 숫자가 여기에 표시됩니다."></textarea>
+            </div>
+            <div class="button-group">
+                <button class="copy-btn" data-target="number-output">결과 복사</button>
+            </div>
+        </div>
 
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
 
-                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+        <div class="converter-section">
+            <label for="number-input">숫자 입력 (디코딩)</label>
+            <div class="input-group">
+                <textarea id="number-input" placeholder="여기에 숫자를 입력하세요."></textarea>
+            </div>
+            <div class="button-group">
+                <button id="decode-btn">한글로 변환</button>
+            </div>
+            <label for="hangul-output" style="margin-top: 15px;">결과 (한글)</label>
+            <div class="input-group">
+                <textarea id="hangul-output" readonly placeholder="복원된 한글이 여기에 표시됩니다."></textarea>
+            </div>
+            <div class="button-group">
+                <button class="copy-btn" data-target="hangul-output">결과 복사</button>
+            </div>
+        </div>
 
-
-                <div class="converter-section">
-                    <label for="number-input">숫자 입력 (디코딩)</label>
-                    <div class="input-group">
-                        <textarea id="number-input" placeholder="여기에 숫자를 입력하세요."></textarea>
-                    </div>
-                    <div class="button-group">
-                        <button id="decode-btn">한글로 변환</button>
-                    </div>
-                    <label for="hangul-output" style="margin-top: 15px;">결과 (한글)</label>
-                    <div class="input-group">
-                        <textarea id="hangul-output" readonly placeholder="복원된 한글이 여기에 표시됩니다."></textarea>
-                    </div>
-                    <div class="button-group">
-                        <button class="copy-btn" data-target="hangul-output">결과 복사</button>
-                    </div>
-                </div>
-
-                <footer>
-                    <p>PYH</p>
-                </footer>
+        <footer>
+            <p>PYH</p>
+        </footer>
     </div>
 
     <script>
