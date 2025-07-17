@@ -160,7 +160,7 @@
     <div class="container">
         <h1>암호 변환기</h1>
         <p class="description">
-            <strong style="color: #ccc;">[인코딩 규칙]</strong><br>
+            <strong style="color: #ccc;">[인코딩 알고리즘]</strong><br>
             각 음절 ('가'~'힣')은 유니코드 순서에 따라 0~11171의 고유한 인덱스를 갖습니다.<br>
             ( 인덱스=(초성 번호×21×28)+(중성 번호×28)+종성 번호 )<br>
             정보 손실을 막기 위해 인덱스에 1을 더한 1~11172 범위의 값을 사용합니다. <br>
@@ -171,7 +171,7 @@
                 v<sub>i</sub>×11172<sup>n−i</sup> )
             </span><br>
 
-            <strong style="color: #ccc;">[디코딩 규칙]</strong><br>
+            <strong style="color: #ccc;">[디코딩 알고리즘]</strong><br>
             인코딩된 숫자 N으로부터 복원된 음절들은 추출 순서의 역순으로 정렬하여 문자열을 만듭니다.<br>
             인코딩 시 더해진 1을 보정하기 위해, N에서 1을 뺀 값을 11172로 나눕니다.<br>
             이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신하며 이 과정을 반복합니다.<br>
