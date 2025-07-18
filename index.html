@@ -4,17 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>암호(아님) 변환기</title>
+    <title>암호 변환기</title>
     <style>
         :root {
-            --primary-color: #007bff;
-            --body-bg: #121212;
-            --container-bg: #1e1e1e;
+            --body-bg: #000000;
+            --chat-container-bg: #000000;
+            --border-color: #2a2a2a;
+            --bot-message-bg: #1a1a1a;
+            --input-bg: #404040;
+            --user-message-bg: #555555;
             --text-primary: #e0e0e0;
             --text-secondary: #b0b0b0;
-            --border-color: #333;
-            --input-bg: #252525;
-            --input-readonly-bg: #1a1a1a;
         }
 
         body {
@@ -25,344 +25,597 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 15px;
+            height: 100vh;
+            padding: 10px;
             box-sizing: border-box;
         }
 
-        .container {
+        .chat-container {
             width: 100%;
-            max-width: 600px;
-            background-color: var(--container-bg);
-            padding: 25px 30px;
+            max-width: 700px;
+            height: 90vh;
+            max-height: 800px;
+            background-color: var(--chat-container-bg);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        h1 {
+        .chat-header {
+            padding: 15px 20px;
+            background-color: var(--body-bg);
+            border-bottom: 1px solid var(--border-color);
             text-align: center;
-            color: var(--text-primary);
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .description {
-            text-align: center;
-            font-size: 0.9em;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .converter-section {
-            margin-bottom: 25px;
-        }
-
-        .converter-section:last-child {
-            margin-bottom: 0;
-        }
-
-        label {
-            display: block;
+            font-size: 1.2em;
             font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 1.1em;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .input-group {
+        #help-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+        }
+
+        #help-btn:hover {
+            background-color: #333;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.5;
             position: relative;
+            overflow-wrap: break-word;
+            word-break: break-all;
         }
 
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 12px;
-            border-radius: 8px;
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message.bot .message-content {
+            background-color: transparent;
             border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+
+        .message.user {
+            align-self: flex-end;
+        }
+
+        .message.user .message-content {
+            background-color: var(--user-message-bg);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .message-bubble {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 5px;
+            opacity: 0.7;
+            transition: opacity 0.2s, color 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+            color: white;
+        }
+
+        .chat-input-form {
+            position: relative;
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--body-bg);
+            align-items: flex-start;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            min-height: 24px;
+            max-height: 120px;
+            padding: 12px 55px 12px 20px;
+            border-radius: 22px;
+            border: none;
             background-color: var(--input-bg);
             color: var(--text-primary);
             font-size: 1em;
             font-family: inherit;
-            box-sizing: border-box;
             resize: none;
-            transition: border-color 0.2s, background-color 0.2s;
+            overflow-y: auto;
         }
 
-        textarea::placeholder {
-            color: #777;
-        }
-
-        textarea:focus {
+        #message-input:focus {
             outline: none;
-            border-color: #e0e0e0;
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
         }
 
-        textarea[readonly] {
-            background-color: var(--input-readonly-bg);
-            color: var(--text-secondary);
-            cursor: default;
+        #message-input::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
+        #message-input::-webkit-scrollbar-track {
+            background: transparent;
         }
 
-        button {
-            flex-grow: 1;
-            padding: 12px 15px;
-            font-size: 1em;
-            font-weight: bold;
-            color: white;
-            background-color: #333;
+        #message-input::-webkit-scrollbar-thumb {
+            background-color: #666;
+            border-radius: 4px;
+            border: 2px solid var(--input-bg);
+        }
+
+        #message-input::-webkit-scrollbar-thumb:hover {
+            background-color: #888;
+        }
+
+        #send-btn {
+            position: absolute;
+            right: 23px;
+            bottom: 23px;
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             border: none;
-            border-radius: 8px;
+            background-color: white;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
 
-        button:hover {
-            background-color: #444;
+        #send-btn.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
         }
 
-        button:active {
-            transform: scale(0.98);
+        #send-btn svg {
+            width: 20px;
+            height: 20px;
         }
 
-        .copy-btn {
-            background-color: #495057;
-            flex-grow: 0;
-            padding: 0 15px;
+        #send-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
 
-        .copy-btn:hover {
-            background-color: #343a40;
+        .typing-indicator {
+            align-self: flex-start;
+            padding: 10px 15px;
+            background-color: var(--bot-message-bg);
+            border-radius: 18px;
+            border-top-left-radius: 4px;
         }
 
-        footer {
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            animation: bounce 1.3s infinite;
+        }
+
+        .typing-indicator span:nth-of-type(2) {
+            animation-delay: 0.15s;
+        }
+
+        .typing-indicator span:nth-of-type(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #222;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 550px;
+            border-radius: 12px;
+            position: relative;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: white;
             text-align: center;
-            margin-top: 25px;
-            font-size: 0.8em;
-            color: #888;
+            margin-bottom: 20px;
         }
 
-        footer a {
-            color: var(--primary-color);
+        .modal-content .description {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .modal-content .description strong {
+            display: inline-block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+            color: #ddd;
+        }
+
+        .modal-content .description strong:first-child {
+            margin-top: 0;
+        }
+
+        .modal-content sub,
+        .modal-content sup {
+            font-size: 0.7em;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline;
+        }
+
+        .modal-content sub {
+            top: 0.5em;
+        }
+
+        .modal-content sup {
+            top: -0.5em;
+        }
+
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: white;
             text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>암호 변환기</h1>
-        <p class="description">
-            <strong style="color: #ccc;">[인코딩 알고리즘]</strong><br>
-            각 음절 ('가'~'힣')은 유니코드 순서에 따라 0~11171의 고유한 인덱스를 갖습니다.<br>
-            ( 인덱스=(초성 번호×21×28)+(중성 번호×28)+종성 번호 )<br>
-            정보 손실을 막기 위해 인덱스에 1을 더한 1~11172 범위의 값을 사용합니다. <br>
-            ( v<sub>i</sub> = 인덱스+1 )<br>
-            이 값을 0이 없는 11172진법의 자릿값으로 하여 문자열을 하나의 10진수로 변환합니다.<br>
-            <span style="display:inline-block; text-align: left;">
-                ( 숫자 = v₁ × 11172ⁿ⁻¹ + v₂ × 11172ⁿ⁻² + ⋯ + vₙ × 11172⁰ = ∑<sub>i=1</sub><sup>n</sup>
-                v<sub>i</sub>×11172<sup>n−i</sup> )
-            </span><br>
+    <div class="chat-container">
+        <div class="chat-header">
+            <span>암호 변환기</span>
+            <button id="help-btn" title="알고리즘 설명 보기">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                    <path
+                        d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
+                </svg>
+            </button>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+        </div>
+        <form class="chat-input-form" id="chat-form">
+            <textarea id="message-input" placeholder="한글 또는 숫자를 입력하세요..." rows="1"></textarea>
+            <button id="send-btn" type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black"
+                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+            </button>
+        </form>
+    </div>
 
-            <strong style="color: #ccc;">[디코딩 알고리즘]</strong><br>
-            인코딩된 숫자 N으로부터 복원된 음절들은 추출 순서의 역순으로 정렬하여 문자열을 만듭니다.<br>
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <h2>알고리즘 설명</h2>
+            <p class="description">
+                <strong>[인코딩 알고리즘]</strong><br>
+                각 음절 ('가'~'힣')은 유니코드 순서에 따라 0~11171의 고유한 인덱스를 갖습니다.<br>
+                (인덱스 = (초성 번호×21×28) + (중성 번호×28) + 종성 번호)<br>
+                정보 손실을 막기 위해 인덱스에 1을 더한 1~11172 범위의 값을 사용합니다.<br>
+                (v<sub>i</sub> = 인덱스 + 1)<br>
+                이 값을 0이 없는 11172진법의 자릿값으로 하여 문자열을 하나의 10진수로 변환합니다.<br>
+                <span style="display:inline-block; text-align: left;">
+                    (숫자 = v₁×11172ⁿ⁻¹ + v₂×11172ⁿ⁻² + ⋯ + vₙ×11172⁰ =
+                    ∑<sub>i=1</sub><sup>n</sup>v<sub>i</sub>×11172<sup>n−i</sup> )
+                </span><br>
+
+                <strong>[디코딩 알고리즘]</strong><br>
+            디코딩은 인코딩의 역산 과정으로, 인코딩된 숫자 N으로부터 음절을 역순으로 추출합니다.<br>
             인코딩 시 더해진 1을 보정하기 위해, N에서 1을 뺀 값을 11172로 나눕니다.<br>
-            이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신하며 이 과정을 반복합니다.<br>
-
-            <span style="display:inline-block; text-align: left;">
-                   반복: N > 0인 동안<br>
-                   보정 값 = N - 1<br>
-                   인덱스 = 보정 값 mod 11172<br>
-                   음절 = chr(0xAC00 + 인덱스)<br>
-                   N = 보정 값 ÷ 11172 (정수 나눗셈)<br>
-            </span>
-        </p>
-
-        <div class="converter-section">
-            <label for="hangul-input">한글 입력 (인코딩)</label>
-            <div class="input-group">
-                <textarea id="hangul-input" placeholder="여기에 한글을 입력하세요."></textarea>
-            </div>
-            <div class="button-group">
-                <button id="encode-btn">숫자로 변환</button>
-            </div>
-            <label for="number-output" style="margin-top: 15px;">결과 (숫자)</label>
-            <div class="input-group">
-                <textarea id="number-output" readonly placeholder="변환된 숫자가 여기에 표시됩니다."></textarea>
-            </div>
-            <div class="button-group">
-                <button class="copy-btn" data-target="number-output">결과 복사</button>
-            </div>
+            이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신합니다.<br>
+            이 과정을 반복하여 문자열을 복원합니다.<br>
+                <span
+                    style="display:inline-block; text-align: left; background-color: #333; padding: 10px; border-radius: 5px; margin-top: 5px;">
+                    <b>반복:</b> N > 0인 동안<br>
+                       보정 값 = N - 1<br>
+                       인덱스 = 보정 값 % 11172<br>
+                       음절 = chr(0xAC00 + 인덱스)<br>
+                       N = 보정 값 / 11172 (정수 나눗셈)<br>
+                </span>
+            </p>
         </div>
-
-        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
-
-        <div class="converter-section">
-            <label for="number-input">숫자 입력 (디코딩)</label>
-            <div class="input-group">
-                <textarea id="number-input" placeholder="여기에 숫자를 입력하세요."></textarea>
-            </div>
-            <div class="button-group">
-                <button id="decode-btn">한글로 변환</button>
-            </div>
-            <label for="hangul-output" style="margin-top: 15px;">결과 (한글)</label>
-            <div class="input-group">
-                <textarea id="hangul-output" readonly placeholder="복원된 한글이 여기에 표시됩니다."></textarea>
-            </div>
-            <div class="button-group">
-                <button class="copy-btn" data-target="hangul-output">결과 복사</button>
-            </div>
-        </div>
-
-        <footer>
-            <p>PYH</p>
-        </footer>
     </div>
 
     <script>
-        const hangulInput = document.getElementById('hangul-input');
-        const numberOutput = document.getElementById('number-output');
-        const encodeBtn = document.getElementById('encode-btn');
-
-        const numberInput = document.getElementById('number-input');
-        const hangulOutput = document.getElementById('hangul-output');
-        const decodeBtn = document.getElementById('decode-btn');
-
-        const copyBtns = document.querySelectorAll('.copy-btn');
-        const allButtons = document.querySelectorAll('button');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const closeModalBtn = document.querySelector('.close-btn');
 
         const HANGUL_BASE = 44032n;
         const HANGUL_COUNT = 11172n;
-        
-        const DIGITAL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%*?';
-
-        function progressiveScrambleEffect(targetElement, finalText, type) {
-            allButtons.forEach(btn => btn.disabled = true);
-            
-            let revealedCount = 0;
-            const totalLength = finalText.length;
-            
-            if (totalLength === 0) {
-                targetElement.value = '';
-                allButtons.forEach(btn => btn.disabled = false);
-                return;
-            }
-
-            const DURATION_TOTAL = 800;
-            let intervalTime = DURATION_TOTAL / totalLength;
-            intervalTime = Math.max(20, Math.min(100, intervalTime));
-
-            let intervalId = setInterval(() => {
-                revealedCount++;
-                const revealedPart = finalText.substring(0, revealedCount);
-                
-                let scrambledPart = '';
-                for (let i = revealedCount; i < totalLength; i++) {
-                    if (type === 'number') {
-                        const randomChars = '0123456789';
-                        scrambledPart += randomChars[Math.floor(Math.random() * randomChars.length)];
-                    } else {
-                        scrambledPart += DIGITAL_CHARS[Math.floor(Math.random() * DIGITAL_CHARS.length)];
-                    }
-                }
-
-                targetElement.value = revealedPart + scrambledPart;
-
-                if (revealedCount >= totalLength) {
-                    clearInterval(intervalId);
-                    targetElement.value = finalText;
-                    allButtons.forEach(btn => btn.disabled = false);
-                }
-            }, intervalTime);
-        }
+        let singleLineScrollHeight;
 
         function encodeHangul(text) {
-            if (!text) return '';
-            let result = 0n;
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                const charCode = BigInt(char.charCodeAt(0));
-                if (charCode < HANGUL_BASE || charCode >= HANGUL_BASE + HANGUL_COUNT) {
-                    alert(`오류: '${char}'는 변환할 수 없는 문자입니다.\n'가'부터 '힣'까지의 한글만 입력해주세요.`);
-                    return null;
+            const segments = text.match(/[가-힣]+|[^가-힣]+/g) || [];
+            
+            const processedSegments = segments.map(segment => {
+                if (/^[가-힣]+$/.test(segment)) {
+                    let result = 0n;
+                    for (let i = 0; i < segment.length; i++) {
+                        const charCode = BigInt(segment[i].charCodeAt(0));
+                        const value = (charCode - HANGUL_BASE) + 1n;
+                        result = result * HANGUL_COUNT + value;
+                    }
+                    return result.toLocaleString('en-US');
+                } else {
+                    return segment;
                 }
-                const value = (charCode - HANGUL_BASE) + 1n;
-                result = result * HANGUL_COUNT + value;
-            }
-            return result.toLocaleString('en-US');
+            });
+
+            return { success: true, data: processedSegments.join('') };
         }
 
         function decodeNumber(numStr) {
-            if (!numStr.trim()) return '';
-            try {
-                const cleanNumStr = numStr.replace(/,/g, '');
-                let num = BigInt(cleanNumStr);
-                if (num < 0n) throw new Error("음수는 변환할 수 없습니다.");
-                if (num === 0n) throw new Error("0은 변환할 수 없습니다.");
-                let result = '';
-                while (num > 0n) {
-                    const remainder = (num - 1n) % HANGUL_COUNT;
-                    const charCode = remainder + HANGUL_BASE;
-                    result = String.fromCharCode(Number(charCode)) + result;
-                    num = (num - 1n) / HANGUL_COUNT;
+            const segments = numStr.match(/[0-9,]+|[^0-9,]+/g) || [];
+
+            const processedSegments = segments.map(segment => {
+                if (/^[0-9,]+$/.test(segment)) {
+                    try {
+                        const cleanNumStr = segment.replace(/,/g, '');
+                        let num = BigInt(cleanNumStr);
+                        if (num <= 0n) return segment;
+
+                        let result = '';
+                        while (num > 0n) {
+                            const remainder = (num - 1n) % HANGUL_COUNT;
+                            const charCode = remainder + HANGUL_BASE;
+                            result = String.fromCharCode(Number(charCode)) + result;
+                            num = (num - 1n) / HANGUL_COUNT;
+                        }
+                        return result;
+                    } catch(e) {
+                        return segment;
+                    }
+                } else {
+                    return segment;
                 }
-                return result;
-            } catch (e) {
-                alert("오류: 올바른 숫자 형식이 아니거나 변환할 수 없는 값입니다.\n양수만 입력해주세요.");
-                return null;
+            });
+
+            return { success: true, data: processedSegments.join('') };
+        }
+
+        function addMessage(sender, content, isBotResponse = false) {
+            const messageEl = document.createElement('div');
+            messageEl.classList.add('message', sender);
+            let messageContentHTML = `<div class="message-content">${content.replace(/\n/g, '<br>')}</div>`;
+
+            if (isBotResponse) {
+                messageEl.innerHTML = `<div class="message-bubble">${messageContentHTML}<button class="copy-btn" title="결과 복사"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9.5a.5.5 0 0 1 1 0V11.5a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h1a.5.5 0 0 1 0 1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V2h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9.5a.5.5 0 0 1 1 0V12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a3 3 0 0 1 3-3h4.5z"/></svg></button></div>`;
+                const copyBtn = messageEl.querySelector('.copy-btn');
+                const rawContent = content.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '');
+
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(rawContent).then(() => {
+                        copyBtn.innerHTML = '✓';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9.5a.5.5 0 0 1 1 0V11.5a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h1a.5.5 0 0 1 0 1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V2h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9.5a.5.5 0 0 1 1 0V12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V4a3 3 0 0 1 3-3h4.5z"/></svg>`;
+                        }, 1500);
+                    });
+                });
+            } else {
+                messageEl.innerHTML = messageContentHTML;
+            }
+
+            chatMessages.appendChild(messageEl);
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'typing-indicator';
+            indicator.classList.add('message', 'bot', 'typing-indicator');
+            indicator.innerHTML = '<span></span><span></span><span></span>';
+            chatMessages.appendChild(indicator);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function autoResizeTextarea() {
+            messageInput.style.height = 'auto';
+            const currentScrollHeight = messageInput.scrollHeight;
+            if (currentScrollHeight > singleLineScrollHeight) {
+                messageInput.style.height = currentScrollHeight + 'px';
+            }
+            if (messageInput.value.trim().length > 0) {
+                sendBtn.classList.add('visible');
+            } else {
+                sendBtn.classList.remove('visible');
             }
         }
 
-        encodeBtn.addEventListener('click', () => {
-            const finalResult = encodeHangul(hangulInput.value);
-            if (finalResult !== null) {
-                progressiveScrambleEffect(numberOutput, finalResult, 'number');
-            }
-        });
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userInput = messageInput.value.trim();
+            if (!userInput) return;
 
-        decodeBtn.addEventListener('click', () => {
-            const finalResult = decodeNumber(numberInput.value);
-            if (finalResult !== null) {
-                progressiveScrambleEffect(hangulOutput, finalResult, 'hangul');
-            }
-        });
+            addMessage('user', userInput);
+            messageInput.value = '';
+            autoResizeTextarea();
 
-        copyBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const targetId = btn.dataset.target;
-                const targetTextarea = document.getElementById(targetId);
-                if (targetTextarea.value) {
-                    navigator.clipboard.writeText(targetTextarea.value).then(() => {
-                        const originalText = btn.textContent;
-                        btn.textContent = '복사 완료!';
-                        setTimeout(() => { btn.textContent = originalText; }, 1500);
-                    }).catch(err => { alert('복사에 실패했습니다.'); });
+            showTypingIndicator();
+            sendBtn.disabled = true;
+
+            setTimeout(() => {
+                removeTypingIndicator();
+                let result;
+                const hasHangul = /[가-힣]/.test(userInput);
+                const hasNumber = /[0-9]/.test(userInput);
+
+                if (hasHangul && hasNumber) {
+                    result = { success: false, error: "정보 손실을 방지하기 위해 한글과 숫자를 함께 입력할 수 없습니다." };
+                } else if (hasHangul) {
+                    result = encodeHangul(userInput);
+                } else if (hasNumber) {
+                    result = decodeNumber(userInput);
                 } else {
-                    alert('복사할 내용이 없습니다.');
+                    result = { success: true, data: userInput };
                 }
-            });
+
+                if (result.success) {
+                    addMessage('bot', result.data, true);
+                } else {
+                    addMessage('bot', `⚠️ 오류: ${result.error}`);
+                }
+                sendBtn.disabled = false;
+                messageInput.focus();
+            }, 800 + Math.random() * 500);
         });
 
-        hangulInput.addEventListener('keydown', (e) => {
+        messageInput.addEventListener('input', autoResizeTextarea);
+
+        messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                encodeBtn.click();
+                chatForm.dispatchEvent(new Event('submit'));
             }
         });
 
-        numberInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                decodeBtn.click();
+        function showWelcomeMessage() {
+            const welcomeText = "변환할 한글 또는 숫자를 입력해주세요.";
+            setTimeout(() => { addMessage('bot', welcomeText); }, 500);
+        }
+
+        window.onload = () => {
+            showWelcomeMessage();
+            messageInput.focus();
+            messageInput.style.height = 'auto';
+            singleLineScrollHeight = messageInput.scrollHeight;
+        };
+
+        helpBtn.addEventListener('click', () => {
+            helpModal.classList.add('visible');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            helpModal.classList.remove('visible');
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == helpModal) {
+                helpModal.classList.remove('visible');
             }
         });
     </script>
 </body>
+
 </html>
