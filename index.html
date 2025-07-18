@@ -735,7 +735,7 @@
 
         document.body.addEventListener('touchmove', (event) => {
             const isScrollable = event.composedPath().some(el =>
-                el.classList && el.classList.contains('chat-messages')
+                el.classList && (el.classList.contains('chat-messages') || el.classList.contains('modal-content'))
             );
 
             if (!isScrollable) {
