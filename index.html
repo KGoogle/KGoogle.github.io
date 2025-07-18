@@ -31,6 +31,7 @@
             height: 100dvh;
             padding: 10px;
             box-sizing: border-box;
+            overflow: hidden; 
         }
 
         .chat-container {
@@ -266,6 +267,7 @@
         #send-btn svg {
             width: 18px;
             height: 18px;
+            flex-shrink: 0;
         }
 
         #send-btn:disabled {
@@ -646,6 +648,8 @@
         }
 
         window.onload = () => {
+            document.body.style.minHeight = document.body.clientHeight + 'px';
+
             showWelcomeMessage();
             messageInput.focus();
             autoResizeTextarea();
