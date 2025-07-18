@@ -17,13 +17,14 @@
             --text-secondary: #b0b0b0;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--body-bg);
@@ -31,7 +32,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100dvh; 
+            height: 100dvh;
             padding: 10px;
             box-sizing: border-box;
         }
@@ -39,7 +40,7 @@
         .chat-container {
             width: 100%;
             max-width: 700px;
-            height: 100%; 
+            height: 100%;
             background-color: var(--chat-container-bg);
             border-radius: 12px;
             box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
@@ -162,22 +163,23 @@
             opacity: 1;
             color: white;
         }
-        
+
         .chat-input-form {
             position: relative;
             display: flex;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border-top: 1px solid var(--border-color);
             background-color: var(--body-bg);
-            align-items: flex-start;
+            align-items: flex-end; /* 아이템을 아래쪽으로 정렬 */
         }
 
         #message-input {
             flex-grow: 1;
-            min-height: 24px;
-            max-height: 120px;
-            padding: 10px 55px 10px 20px;
-            border-radius: 20px;
+            box-sizing: border-box;
+            max-height: 100px;
+            padding: 6px 50px 6px 18px;
+            line-height: 1.4;
+            border-radius: 18px;
             border: none;
             background-color: var(--input-bg);
             color: var(--text-primary);
@@ -208,14 +210,14 @@
         #message-input::-webkit-scrollbar-thumb:hover {
             background-color: #888;
         }
-
+        
         #send-btn {
             position: absolute;
-            right: 22px;
-            bottom: 16px;
+            right: 20px;
+            bottom: 12px;
             flex-shrink: 0;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             border: none;
             background-color: white;
@@ -229,7 +231,7 @@
             pointer-events: none;
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        
+
         #send-btn.visible {
             opacity: 1;
             transform: scale(1);
@@ -237,8 +239,8 @@
         }
 
         #send-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
         }
 
         #send-btn:disabled {
@@ -443,7 +445,6 @@
 
         const HANGUL_BASE = 44032n;
         const HANGUL_COUNT = 11172n;
-        let singleLineScrollHeight;
 
         function encodeHangul(text) {
             const segments = text.match(/[가-힣]+|[^가-힣]+/g) || [];
@@ -535,20 +536,15 @@
         }
 
         function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
         }
-
+        
         function autoResizeTextarea() {
+            const hasText = messageInput.value.trim().length > 0;
+            sendBtn.classList.toggle('visible', hasText);
+            
             messageInput.style.height = 'auto';
-            const currentScrollHeight = messageInput.scrollHeight;
-            if (currentScrollHeight > singleLineScrollHeight) {
-                messageInput.style.height = currentScrollHeight + 'px';
-            }
-            if (messageInput.value.trim().length > 0) {
-                sendBtn.classList.add('visible');
-            } else {
-                sendBtn.classList.remove('visible');
-            }
+            messageInput.style.height = messageInput.scrollHeight + 'px';
         }
 
         chatForm.addEventListener('submit', (e) => {
@@ -598,6 +594,12 @@
             }
         });
 
+        messageInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                scrollToBottom();
+            }, 300);
+        });
+
         function showWelcomeMessage() {
             const welcomeText = "변환할 한글 또는 숫자를 입력해주세요.";
             setTimeout(() => { addMessage('bot', welcomeText); }, 500);
@@ -605,9 +607,8 @@
 
         window.onload = () => {
             showWelcomeMessage();
+            autoResizeTextarea();
             messageInput.focus();
-            messageInput.style.height = 'auto';
-            singleLineScrollHeight = messageInput.scrollHeight;
         };
 
         helpBtn.addEventListener('click', () => {
