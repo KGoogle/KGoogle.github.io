@@ -433,12 +433,12 @@
             </button>
         </div>
         <div class="chat-messages" id="chat-messages">
-            <div class="top-notice">숫자가 너무 길어서 알고리즘 변경 or 추가 고민 중...</div>
+            <div class="top-notice">한글 ↔ Base62 텍스트 코덱</div>
         </div>
 
         <form class="chat-input-form" id="chat-form">
             <div class="input-wrapper">
-                <textarea id="message-input" placeholder="한글 또는 숫자를 입력하세요..." rows="1"></textarea>
+                <textarea id="message-input" placeholder="한글 또는 Base62 문자를 입력하세요..." rows="1"></textarea>
                 <button id="send-btn" type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black"
                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -455,22 +455,22 @@
             <span class="close-btn">×</span>
             <h2>알고리즘 설명</h2>
             <p class="description">
-                <strong>[인코딩 알고리즘]</strong><br>
+                <strong>[인코딩: 한글 → Base62]</strong><br>
                 각 음절 ('가'~'힣')은 유니코드 순서에 따라 0~11171의 고유한 인덱스를 갖습니다.<br>
                 (인덱스 = (초성 번호×21×28) + (중성 번호×28) + 종성 번호)<br>
                 정보 손실을 막기 위해 인덱스에 1을 더한 1~11172 범위의 값을 사용합니다.<br>
                 (v<sub>i</sub> = 인덱스 + 1)<br>
                 이 값을 0이 없는 11172진법의 자릿값으로 하여 문자열을 하나의 10진수로 변환합니다.<br>
                 <span style="display:inline-block; text-align: left;">
-                    (숫자 = v₁×11172ⁿ⁻¹ + v₂×11172ⁿ⁻² + ⋯ + vₙ×11172⁰ =
-                    ∑<sub>i=1</sub><sup>n</sup>v<sub>i</sub>×11172<sup>n−i</sup> )
+                    (숫자 = ∑<sub>i=1</sub><sup>n</sup>v<sub>i</sub>×11172<sup>n−i</sup> )
                 </span><br>
+                마지막으로, 이 숫자를 짧게 표현하기 위해 62진법(0-9, a-z, A-Z) 문자열로 변환합니다.<br>
 
-                <strong>[디코딩 알고리즘]</strong><br>
-                디코딩은 인코딩의 역산 과정으로, 인코딩된 숫자 N으로부터 음절을 역순으로 추출합니다.<br>
+                <strong>[디코딩: Base62 → 한글]</strong><br>
+                디코딩은 인코딩의 역산 과정입니다. 먼저 입력된 62진법 문자열을 다시 원래의 10진수 숫자(N)로 변환합니다.<br>
+                그 다음, N으로부터 음절을 역순으로 추출합니다.<br>
                 인코딩 시 더해진 1을 보정하기 위해, N에서 1을 뺀 값을 11172로 나눕니다.<br>
                 이때의 나머지는 '인덱스'가 되고, 몫으로 N값을 갱신합니다.<br>
-                이 과정을 반복하여 문자열을 복원합니다.<br>
                 <span
                     style="display:inline-block; text-align: left; background-color: #333; padding: 10px; border-radius: 5px; margin-top: 5px;">
                     <b>반복:</b> N > 0인 동안<br>
@@ -496,8 +496,32 @@
 
         const HANGUL_BASE = 44032n;
         const HANGUL_COUNT = 11172n;
+        const BASE62_CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const BASE62_BIGINT = BigInt(BASE62_CHARS.length);
 
         let singleLineHeight = 0;
+
+        function toBase62(num) {
+            if (num === 0n) return BASE62_CHARS[0];
+            let result = '';
+            while (num > 0n) {
+                const remainder = num % BASE62_BIGINT;
+                result = BASE62_CHARS[Number(remainder)] + result;
+                num = num / BASE62_BIGINT;
+            }
+            return result;
+        }
+
+        function fromBase62(str) {
+            let result = 0n;
+            for (let i = 0; i < str.length; i++) {
+                const char = str[i];
+                const index = BigInt(BASE62_CHARS.indexOf(char));
+                if (index === -1n) throw new Error("Invalid Base62 character");
+                result = result * BASE62_BIGINT + index;
+            }
+            return result;
+        }
 
         function encodeHangul(text) {
             const segments = text.match(/[가-힣]+|[^가-힣]+/g) || [];
@@ -510,7 +534,7 @@
                         const value = (charCode - HANGUL_BASE) + 1n;
                         result = result * HANGUL_COUNT + value;
                     }
-                    return result.toLocaleString('en-US');
+                    return toBase62(result);
                 } else {
                     return segment;
                 }
@@ -519,15 +543,14 @@
             return { success: true, data: processedSegments.join('') };
         }
 
-        function decodeNumber(numStr) {
-            const segments = numStr.match(/[0-9,]+|[^0-9,]+/g) || [];
+        function decodeString(str) {
+            const segments = str.match(/[0-9a-zA-Z]+|[^0-9a-zA-Z]+/g) || [];
 
             const processedSegments = segments.map(segment => {
-                if (/^[0-9,]+$/.test(segment)) {
+                if (/^[0-9a-zA-Z]+$/.test(segment)) {
                     try {
-                        const cleanNumStr = segment.replace(/,/g, '');
-                        let num = BigInt(cleanNumStr);
-                        if (num <= 0n) return segment;
+                        let num = fromBase62(segment);
+                        if (num <= 0n && segment !== '0') return segment;
 
                         let result = '';
                         while (num > 0n) {
@@ -547,7 +570,7 @@
 
             return { success: true, data: processedSegments.join('') };
         }
-
+        
         function addMessage(sender, content, isBotResponse = false) {
             const messageEl = document.createElement('div');
             messageEl.classList.add('message', sender);
@@ -634,14 +657,14 @@
                 removeTypingIndicator();
                 let result;
                 const hasHangul = /[가-힣]/.test(userInput);
-                const hasNumber = /[0-9]/.test(userInput);
+                const hasBase62Chars = /[a-zA-Z0-9]/.test(userInput);
 
-                if (hasHangul && hasNumber) {
-                    result = { success: false, error: "정보 손실을 방지하기 위해 한글과 숫자를 함께 입력할 수 없습니다." };
+                if (hasHangul && hasBase62Chars) {
+                    result = { success: false, error: "정보 손실을 방지하기 위해 한글과 Base62 문자(영문/숫자)를 함께 입력할 수 없습니다." };
                 } else if (hasHangul) {
                     result = encodeHangul(userInput);
-                } else if (hasNumber) {
-                    result = decodeNumber(userInput);
+                } else if (hasBase62Chars) {
+                    result = decodeString(userInput);
                 } else {
                     result = { success: true, data: userInput };
                 }
@@ -666,7 +689,7 @@
         });
 
         function showWelcomeMessage() {
-            const welcomeText = "변환할 한글 또는 숫자를 입력해주세요.";
+            const welcomeText = "변환할 한글 또는 Base62 (영문/숫자)를 입력해주세요.";
             setTimeout(() => { addMessage('bot', welcomeText); }, 500);
         }
 
