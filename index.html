@@ -52,8 +52,7 @@
             font-size: 1.2em;
             font-weight: bold;
             flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
+            position: relative;
             align-items: center;
         }
 
@@ -69,6 +68,10 @@
             border-radius: 50%;
             width: 28px;
             height: 28px;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         #help-btn:hover {
@@ -158,7 +161,7 @@
         .chat-input-form {
             position: relative;
             display: flex;
-            padding: 15px;
+            padding: 10px 15px;
             border-top: 1px solid var(--border-color);
             background-color: var(--body-bg);
             align-items: flex-start;
@@ -168,8 +171,8 @@
             flex-grow: 1;
             min-height: 24px;
             max-height: 120px;
-            padding: 12px 55px 12px 20px;
-            border-radius: 22px;
+            padding: 10px 55px 10px 20px;
+            border-radius: 20px;
             border: none;
             background-color: var(--input-bg);
             color: var(--text-primary);
@@ -203,8 +206,8 @@
 
         #send-btn {
             position: absolute;
-            right: 23px;
-            bottom: 23px;
+            right: 22px;
+            bottom: 16px;
             flex-shrink: 0;
             width: 32px;
             height: 32px;
