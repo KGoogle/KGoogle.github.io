@@ -23,16 +23,21 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--body-bg);
             color: var(--text-primary);
-            height: 100dvh;
             padding: 10px;
             box-sizing: border-box;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
         .chat-container {
@@ -469,7 +474,7 @@
     </div>
 
     <script>
-const chatContainer = document.querySelector('.chat-container');
+        const chatContainer = document.querySelector('.chat-container');
         const chatMessages = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const messageInput = document.getElementById('message-input');
@@ -592,7 +597,7 @@ const chatContainer = document.querySelector('.chat-container');
 
             messageInput.style.height = messageInput.scrollHeight + 'px';
 
-const formHeight = chatForm.offsetHeight;
+            const formHeight = chatForm.offsetHeight;
             chatContainer.style.setProperty('--input-height', `${formHeight}px`);
 
             if (messageInput.value.trim().length > 0) {
@@ -600,7 +605,7 @@ const formHeight = chatForm.offsetHeight;
             } else {
                 sendBtn.classList.remove('visible');
             }
-scrollToBottom();
+            scrollToBottom();
         }
 
         chatForm.addEventListener('submit', (e) => {
