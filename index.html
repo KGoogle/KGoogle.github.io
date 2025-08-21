@@ -507,24 +507,35 @@
             position: absolute;
             visibility: hidden;
             white-space: pre;
-            font-family: inherit;
-            font-size: inherit;
-            letter-spacing: 0.3em;
+        }
+
+        #password-input,
+        #password-ruler {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.2em;
+            letter-spacing: 0.4em;
+            text-shadow: inherit;
+            vertical-align: top;
         }
 
         #password-input {
             background: transparent;
-            border: none;
             color: var(--terminal-text);
-            font-family: inherit;
-            font-size: inherit;
-            text-shadow: inherit;
-            letter-spacing: 0.3em;
             width: 120px;
-            padding: 0;
             caret-color: transparent;
             -webkit-text-security: disc;
             text-security: disc;
+        }
+        
+        @media (max-width: 600px) {
+            #password-input,
+            #password-ruler {
+                font-size: 1.5em;
+                letter-spacing: 0.3em;
+            }
         }
 
         #password-input:focus {
@@ -617,7 +628,7 @@
                         <span class="prompt">></span>
                         <div id="input-container">
                             <span id="password-ruler"></span>
-                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric"
+                            <input type="password" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric"
                                 pattern="[0-9]*">
                             <span id="cursor"></span>
                         </div>
@@ -861,7 +872,7 @@
 
             const updatePasswordCursorPosition = () => {
                 setTimeout(() => {
-                    ruler.textContent = '0'.repeat(passwordInput.value.length);
+                    ruler.textContent = '●'.repeat(passwordInput.value.length);
                     cursor.style.left = `${ruler.offsetWidth}px`;
                 }, 0);
             };
