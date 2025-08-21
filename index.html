@@ -615,10 +615,11 @@
                         <span class="prompt">></span>
                         <div id="input-container">
                             <span id="password-ruler"></span>
-                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric">
+                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
                             <span id="cursor"></span>
                         </div>
                     </label>
+                    <button type="submit" style="display: none;"></button>
                 </form>
                 <p id="password-error-msg"></p>
             </div>
@@ -867,7 +868,6 @@
 
         window.onload = () => {
             const passwordModal = document.getElementById('password-modal');
-            const passwordModalContent = document.querySelector('#password-modal .modal-content');
             const terminalOutput = document.getElementById('terminal-output');
             const terminalInfo = document.getElementById('terminal-info');
             const cursor = document.getElementById('cursor');
@@ -875,6 +875,13 @@
             const passwordInput = document.getElementById('password-input');
             const passwordForm = document.getElementById('password-form');
             const passwordErrorMsg = document.getElementById('password-error-msg');
+
+            const updatePasswordCursorPosition = () => {
+                setTimeout(() => {
+                    ruler.textContent = passwordInput.value;
+                    cursor.style.left = `${ruler.offsetWidth}px`;
+                }, 0);
+            };
 
             const typewriterEffect = (element, text, delay = 50, callback) => {
                 let i = 0;
@@ -891,6 +898,11 @@
             };
 
             const bootTerminal = (withAnimation) => {
+                const focusAndPositionCursor = () => {
+                    passwordInput.focus();
+                    updatePasswordCursorPosition();
+                };
+
                 if (withAnimation) {
                     const p1 = terminalInfo.querySelector('p:first-child');
                     const p2 = terminalInfo.querySelector('p:last-child');
@@ -904,12 +916,12 @@
                         setTimeout(() => {
                             typewriterEffect(p2, originalText2, 50, () => {
                                 passwordForm.style.opacity = '1';
-                                passwordInput.focus();
+                                focusAndPositionCursor();
                             });
                         }, 200);
                     });
                 } else {
-                    passwordInput.focus();
+                    focusAndPositionCursor();
                 }
             };
 
@@ -944,11 +956,8 @@
                 } else {
                     passwordErrorMsg.textContent = 'ACCESS DENIED.';
                     passwordInput.value = '';
-                    ruler.textContent = '';
-                    cursor.style.left = '0px';
-
+                    updatePasswordCursorPosition();
                     passwordInput.focus();
-
                     setTimeout(() => {
                         passwordErrorMsg.textContent = '';
                     }, 2000);
@@ -959,12 +968,21 @@
                 e.preventDefault();
                 handlePasswordSubmit();
             });
+            
+            passwordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handlePasswordSubmit();
+                }
+            });
 
             passwordInput.addEventListener('input', () => {
-                ruler.textContent = passwordInput.value;
-                cursor.style.left = `${ruler.offsetWidth}px`;
+                updatePasswordCursorPosition();
                 passwordErrorMsg.textContent = '';
             });
+            
+            passwordInput.addEventListener('focus', updatePasswordCursorPosition);
+
 
             viewHelpFromPasswordBtn.addEventListener('click', () => {
                 helpModal.classList.add('visible');
