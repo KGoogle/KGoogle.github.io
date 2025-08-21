@@ -427,6 +427,7 @@
             align-items: flex-start;
             gap: 0.5em;
         }
+
         .modal-content p.warning strong {
             flex-shrink: 0;
         }
@@ -529,7 +530,7 @@
         #password-input:focus {
             outline: none;
         }
-        
+
         #password-form #cursor {
             position: absolute;
             top: 0;
@@ -610,12 +611,13 @@
                     <p>CONNECTION ESTABLISHED...</p>
                     <p>AWAITING 4-DIGIT SIGNAL...</p>
                 </div>
-                <form id="password-form">
+                <form id="password-form" action="javascript:void(0);">
                     <label for="password-input" id="password-label">
                         <span class="prompt">></span>
                         <div id="input-container">
                             <span id="password-ruler"></span>
-                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
+                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric"
+                                pattern="[0-9]*">
                             <span id="cursor"></span>
                         </div>
                     </label>
@@ -773,7 +775,7 @@
         }
 
         async function getAiResponse(history, userInput) {
-            const API_KEY = "YOUR_API_KEY";
+            const API_KEY = "YOUR_API_KEY"; // 여기에 API 키를 입력하세요.
 
             if (API_KEY === "YOUR_API_KEY") {
                 console.error("API 키가 설정되지 않았습니다. getAiResponse 함수에서 API_KEY를 설정해주세요.");
@@ -878,7 +880,8 @@
 
             const updatePasswordCursorPosition = () => {
                 setTimeout(() => {
-                    ruler.textContent = passwordInput.value;
+                    const bulletChar = '•';
+                    ruler.textContent = bulletChar.repeat(passwordInput.value.length);
                     cursor.style.left = `${ruler.offsetWidth}px`;
                 }, 0);
             };
@@ -906,15 +909,13 @@
                 if (withAnimation) {
                     const p1 = terminalInfo.querySelector('p:first-child');
                     const p2 = terminalInfo.querySelector('p:last-child');
-                    const originalText1 = p1.textContent;
-                    const originalText2 = p2.textContent;
                     p1.textContent = '';
                     p2.textContent = '';
                     passwordForm.style.opacity = '0';
 
-                    typewriterEffect(p1, originalText1, 50, () => {
+                    typewriterEffect(p1, 'CONNECTION ESTABLISHED...', 50, () => {
                         setTimeout(() => {
-                            typewriterEffect(p2, originalText2, 50, () => {
+                            typewriterEffect(p2, 'AWAITING 4-DIGIT SIGNAL...', 50, () => {
                                 passwordForm.style.opacity = '1';
                                 focusAndPositionCursor();
                             });
@@ -928,11 +929,12 @@
             const handlePasswordSubmit = () => {
                 if (passwordInput.value === CORRECT_PASSWORD) {
                     sessionStorage.setItem('isAuthenticated', 'true');
-
+                    passwordInput.blur();
                     passwordInput.disabled = true;
                     passwordErrorMsg.textContent = '';
                     terminalInfo.style.opacity = '0';
                     passwordForm.style.opacity = '0';
+                    cursor.style.display = 'none';
 
                     setTimeout(() => {
                         terminalOutput.innerHTML = '';
@@ -968,9 +970,9 @@
                 e.preventDefault();
                 handlePasswordSubmit();
             });
-            
+
             passwordInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' || e.keyCode === 13) {
                     e.preventDefault();
                     handlePasswordSubmit();
                 }
@@ -980,8 +982,14 @@
                 updatePasswordCursorPosition();
                 passwordErrorMsg.textContent = '';
             });
-            
-            passwordInput.addEventListener('focus', updatePasswordCursorPosition);
+
+            passwordInput.addEventListener('focus', () => {
+                cursor.style.animation = 'blink 1s step-end infinite';
+                updatePasswordCursorPosition();
+            });
+            passwordInput.addEventListener('blur', () => {
+                cursor.style.animation = 'none';
+            });
 
 
             viewHelpFromPasswordBtn.addEventListener('click', () => {
