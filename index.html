@@ -576,17 +576,6 @@
             color: var(--terminal-bg);
             text-shadow: none;
         }
-        
-        @media (max-width: 600px) {
-            #password-input {
-                font-size: 1em;
-                letter-spacing: 0.2em;
-            }
-
-            #password-ruler {
-                letter-spacing: 0.2em;
-            }
-        }
     </style>
 </head>
 
@@ -872,7 +861,7 @@
 
             const updatePasswordCursorPosition = () => {
                 setTimeout(() => {
-                    ruler.textContent = passwordInput.value;
+                    ruler.textContent = '0'.repeat(passwordInput.value.length);
                     cursor.style.left = `${ruler.offsetWidth}px`;
                 }, 0);
             };
