@@ -576,6 +576,17 @@
             color: var(--terminal-bg);
             text-shadow: none;
         }
+        
+        @media (max-width: 600px) {
+            #password-input {
+                font-size: 1em;
+                letter-spacing: 0.2em;
+            }
+
+            #password-ruler {
+                letter-spacing: 0.2em;
+            }
+        }
     </style>
 </head>
 
@@ -769,7 +780,7 @@
         }
 
         async function getAiResponse(history, userInput) {
-            const API_KEY = "YOUR_API_KEY"; // API 키를 입력하세요.
+            const API_KEY = "YOUR_API_KEY"; // API 키 입력
             if (API_KEY === "YOUR_API_KEY") {
                 console.error("API 키가 설정되지 않았습니다.");
                 return "이 우주는 지금 깊은 침묵 속에 있습니다.";
