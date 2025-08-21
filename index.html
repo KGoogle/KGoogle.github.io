@@ -502,7 +502,7 @@
             position: relative;
             display: inline-block;
         }
-
+        
         #password-ruler {
             position: absolute;
             visibility: hidden;
@@ -520,7 +520,7 @@
             font-size: inherit;
             text-shadow: inherit;
             letter-spacing: 0.3em;
-            width: 100px;
+            width: 120px;
             padding: 0;
             caret-color: transparent;
             -webkit-text-security: disc;
@@ -540,6 +540,7 @@
             width: 0.6em;
             height: 1.2em;
             animation: blink 1s step-end infinite;
+            transition: left 0.05s ease-out;
         }
 
         #password-error-msg {
@@ -611,7 +612,7 @@
                     <p>CONNECTION ESTABLISHED...</p>
                     <p>AWAITING 4-DIGIT SIGNAL...</p>
                 </div>
-                <form id="password-form" action="javascript:void(0);">
+                <form id="password-form" action="javascript:void(0);" novalidate>
                     <label for="password-input" id="password-label">
                         <span class="prompt">></span>
                         <div id="input-container">
@@ -720,23 +721,18 @@
                 stepKey = 'start';
             }
             currentStepKey = stepKey;
-
             const stepData = conversationTree[stepKey];
             if (!stepData) {
-                console.error(`'${stepKey}'에 해당하는 대화 단계를 찾을 수 없습니다. 시작점으로 돌아갑니다.`);
+                console.error(`'${stepKey}'에 해당하는 대화 단계를 찾을 수 없습니다.`);
                 await renderStep('start');
                 return;
             }
-
             disableAllOptions();
-
             const messageQueue = [];
             if (stepData.userAction) messageQueue.push({ type: 'user', subType: 'action', content: stepData.userAction });
             else if (stepData.userDialogue) messageQueue.push({ type: 'user', subType: 'text', content: stepData.userDialogue });
-
             if (stepData.response) messageQueue.push(...stepData.response);
             if (stepData.isEnd && stepData.conclusion) messageQueue.push({ type: 'question', content: stepData.conclusion });
-
             for (let i = 0; i < messageQueue.length; i++) {
                 const message = messageQueue[i];
                 if (message.type === 'other' || (message.type !== 'user' && message.type !== 'question')) {
@@ -747,7 +743,6 @@
                 addMessage(message.type, message.content, message.subType);
                 if (i < messageQueue.length - 1) await sleep(MESSAGE_DELAY);
             }
-
             if (stepData.isEnd) {
                 await sleep(MESSAGE_DELAY);
                 await renderStep('conclusion');
@@ -767,7 +762,6 @@
         function handleOptionClick(chosenOptionKey) {
             const currentNodeData = conversationTree[currentStepKey];
             if (!currentNodeData || !currentNodeData.options || !currentNodeData.options[chosenOptionKey]) {
-                console.error("선택지 데이터를 찾을 수 없습니다.");
                 return;
             }
             const optionData = currentNodeData.options[chosenOptionKey];
@@ -775,18 +769,13 @@
         }
 
         async function getAiResponse(history, userInput) {
-            const API_KEY = "YOUR_API_KEY"; // 여기에 API 키를 입력하세요.
-
+            const API_KEY = "YOUR_API_KEY"; // API 키를 입력하세요.
             if (API_KEY === "YOUR_API_KEY") {
-                console.error("API 키가 설정되지 않았습니다. getAiResponse 함수에서 API_KEY를 설정해주세요.");
-                userContext = null;
+                console.error("API 키가 설정되지 않았습니다.");
                 return "이 우주는 지금 깊은 침묵 속에 있습니다.";
             }
-
             const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
-
             const systemPrompt = `당신은 사용자의 마음을 비추는 '우주'입니다. 당신의 역할은 사용자의 말을 우주적이고 시적인 비유로 재해석하여 응답하는 것입니다. 예를 들어, 사용자가 '외로워요'라고 말하면 '당신의 별이 잠시 빛을 잃었군요' 또는 '홀로 항해하는 기분이 드는군요' 와 같이 답변하세요. 항상 짧고 시적인 문장으로, 은유를 사용하여 사용자의 감정을 따뜻하게 반영해주세요. 절대 현실적인 조언이나 해결책을 제시하지 마세요. 답변이 끝난 후, 사용자의 핵심 감정을 다음 키워드 중 가장 적절한 하나로 분석해서, 응답 맨 뒤에 '[CONTEXT:키워드]' 형식으로 몰래 포함시켜 주세요. 가능한 키워드: tired, sad, wants_to_write, curious, skeptical, normal`;
-
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -797,23 +786,16 @@
                         generationConfig: { temperature: 1, topK: 1, topP: 1, maxOutputTokens: 2048 },
                     }),
                 });
-
                 if (!response.ok) throw new Error(`API 오류: ${response.statusText}`);
-
                 const data = await response.json();
                 const rawAiResponse = data.candidates[0].content.parts[0].text;
-
                 const contextMatch = rawAiResponse.match(/\[CONTEXT:(.*?)\]/);
                 if (contextMatch && contextMatch[1]) {
                     userContext = contextMatch[1].trim();
-                    console.log(`AI가 분석한 사용자 컨텍스트: '${userContext}'`);
                 } else {
                     userContext = null;
                 }
-
-                const finalAiReply = rawAiResponse.replace(/\[CONTEXT:.*?\]/, "").trim();
-                return finalAiReply;
-
+                return rawAiResponse.replace(/\[CONTEXT:.*?\]/, "").trim();
             } catch (error) {
                 console.error("AI 응답 생성 중 오류:", error);
                 userContext = null;
@@ -827,13 +809,10 @@
             autoResizeTextarea();
             disableAllOptions();
             messageInput.disabled = true;
-
             showTypingIndicator();
             const aiReply = await getAiResponse([...conversationHistory], userInput);
             removeTypingIndicator();
-
             addMessage('other', aiReply);
-
             optionsWrapper.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
             messageInput.disabled = false;
             messageInput.focus();
@@ -878,10 +857,11 @@
             const passwordForm = document.getElementById('password-form');
             const passwordErrorMsg = document.getElementById('password-error-msg');
 
+            let isSubmitting = false;
+
             const updatePasswordCursorPosition = () => {
                 setTimeout(() => {
-                    const bulletChar = '•';
-                    ruler.textContent = bulletChar.repeat(passwordInput.value.length);
+                    ruler.textContent = passwordInput.value;
                     cursor.style.left = `${ruler.offsetWidth}px`;
                 }, 0);
             };
@@ -927,7 +907,10 @@
             };
 
             const handlePasswordSubmit = () => {
+                if (isSubmitting) return;
+
                 if (passwordInput.value === CORRECT_PASSWORD) {
+                    isSubmitting = true;
                     sessionStorage.setItem('isAuthenticated', 'true');
                     passwordInput.blur();
                     passwordInput.disabled = true;
@@ -943,20 +926,22 @@
                         successMsg.style.textShadow = '0 0 5px var(--terminal-success)';
                         terminalOutput.appendChild(successMsg);
 
-                        typewriterEffect(successMsg, 'ACCESS GRANTED.', 100, () => {
+                        typewriterEffect(successMsg, 'ACCESS GRANTED', 100, () => {
                             setTimeout(() => {
                                 passwordModal.style.opacity = '0';
                                 passwordModal.addEventListener('transitionend', () => {
                                     passwordModal.classList.remove('visible');
                                     mainChatContainer.style.display = 'flex';
                                     renderStep('start');
-                                }, { once: true });
+                                }, {
+                                    once: true
+                                });
                             }, 700);
                         });
                     }, 300);
 
                 } else {
-                    passwordErrorMsg.textContent = 'ACCESS DENIED.';
+                    passwordErrorMsg.textContent = 'ACCESS DENIED';
                     passwordInput.value = '';
                     updatePasswordCursorPosition();
                     passwordInput.focus();
@@ -965,6 +950,15 @@
                     }, 2000);
                 }
             };
+
+            passwordInput.addEventListener('input', () => {
+                updatePasswordCursorPosition();
+                passwordErrorMsg.textContent = '';
+
+                if (passwordInput.value.length === 4) {
+                    handlePasswordSubmit();
+                }
+            });
 
             passwordForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -978,29 +972,29 @@
                 }
             });
 
-            passwordInput.addEventListener('input', () => {
-                updatePasswordCursorPosition();
-                passwordErrorMsg.textContent = '';
-            });
-
             passwordInput.addEventListener('focus', () => {
+                isSubmitting = false;
                 cursor.style.animation = 'blink 1s step-end infinite';
                 updatePasswordCursorPosition();
             });
+
             passwordInput.addEventListener('blur', () => {
                 cursor.style.animation = 'none';
             });
 
-
             viewHelpFromPasswordBtn.addEventListener('click', () => {
                 helpModal.classList.add('visible');
             });
-
-            helpBtn.addEventListener('click', () => helpModal.classList.add('visible'));
-
-            closeModalBtn.addEventListener('click', () => helpModal.classList.remove('visible'));
+            helpBtn.addEventListener('click', () => {
+                helpModal.classList.add('visible');
+            });
+            closeModalBtn.addEventListener('click', () => {
+                helpModal.classList.remove('visible');
+            });
             window.addEventListener('click', (event) => {
-                if (event.target == helpModal) helpModal.classList.remove('visible');
+                if (event.target == helpModal) {
+                    helpModal.classList.remove('visible');
+                }
             });
 
             new ResizeObserver(updateBottomAreaHeight).observe(bottomContainer);
