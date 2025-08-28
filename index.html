@@ -700,8 +700,7 @@
 
         let ai;
         try {
-            // Assuming process.env.API_KEY is available as per guidelines
-            ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            ai = new GoogleGenAI({ apiKey: "API_KEY 입력" });
         } catch (e) {
             console.error("Failed to initialize GoogleGenAI. The API_KEY environment variable might be missing.", e);
         }
@@ -1109,7 +1108,7 @@
                     content: "이것은 결말이 아닌, 새로운 이야기의 첫 페이지입니다."
                 }, {
                     type: 'question',
-                    content: "당신의 모든 선택은 그 자체로 의미 있는 항해였으며, 언제든 다시 새로운 항해를 시작할 수 있습니다."
+                    content: "당신의 모든 선택은 그 자체로 의미 있는 항해이며, 언제든 다시 새로운 항해를 시작할 수 있습니다."
                 }],
                 options: {
                     'restart': {
@@ -1237,6 +1236,9 @@
                 }
                 
                 messageInput.focus();
+                if (document.activeElement === messageInput && bottomContainer.classList.contains('has-options')) {
+                    showOptions();
+                }
             }
             
             updateLayout();
@@ -1289,7 +1291,7 @@
             } catch (error) {
                 console.error("AI 응답 생성 중 오류:", error);
                 userContext = null;
-                return "알 수 없는 정적이 흐릅니다... 잠시 후 다시 이야기를 들려주시겠어요?";
+                return "현재 보안상의 이유로 제한된 기능입니다.";
             }
         }
 
@@ -1451,7 +1453,6 @@
                         successMsg.style.textShadow = '0 0 5px var(--terminal-success)';
                         terminalOutput.appendChild(successMsg);
                         typewriterEffect(successMsg, 'ACCESS GRANTED', 100, () => {
-                            // Performance Fix: Stop animation immediately after access is granted.
                             stopUniverseAnimation();
                             universeCanvas.style.display = 'none';
                             
