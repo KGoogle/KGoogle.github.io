@@ -612,6 +612,13 @@
             content: '> ';
         }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.16.0"
+  }
+}
+</script>
 </head>
 <body>
     
@@ -688,10 +695,21 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { GoogleGenAI } from "@google/genai";
+
+        let ai;
+        try {
+            // Assuming process.env.API_KEY is available as per guidelines
+            ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        } catch (e) {
+            console.error("Failed to initialize GoogleGenAI. The API_KEY environment variable might be missing.", e);
+        }
+
         const universeCanvas = document.getElementById('universe');
         const universeCtx = universeCanvas.getContext('2d');
         let universeW, universeH, universeDpr = Math.max(1, window.devicePixelRatio || 1);
+        let animationFrameId = null;
 
         function resizeUniverse() {
             universeW = innerWidth;
@@ -729,9 +747,9 @@
                 });
             }
         }
-        
+
         createStars(Math.round((universeW * universeH) / 800));
-        
+
         window.addEventListener('resize', () => {
             createStars(Math.round((universeW * universeH) / 800));
         });
@@ -765,9 +783,16 @@
 
             universeCtx.globalAlpha = 1;
 
-            requestAnimationFrame(drawUniverse);
+            animationFrameId = requestAnimationFrame(drawUniverse);
         }
         drawUniverse();
+
+        function stopUniverseAnimation() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        }
 
         const mainChatContainer = document.getElementById('main-chat-container');
         const helpBtn = document.getElementById('help-btn');
@@ -1235,38 +1260,25 @@
             renderStep(optionData.defaultNext);
         }
 
-        async function getAiResponse(history, userInput) {
-            const API_KEY = "YOUR_API_KEY"; // API 키
-            if (API_KEY === "YOUR_API_KEY") {
-                console.error("API 키가 설정되지 않았습니다.");
+        async function getAiResponse(history) {
+            if (!ai) {
+                console.error("AI client not initialized. Please ensure the API_KEY is set.");
                 return "이 우주는 지금 깊은 침묵 속에 있습니다.";
             }
-            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
             const systemPrompt = `당신은 사용자의 마음을 비추는 '우주'입니다. 당신의 역할은 사용자의 말을 우주적이고 시적인 비유로 재해석하여 응답하는 것입니다. 예를 들어, 사용자가 '외로워요'라고 말하면 '당신의 별이 잠시 빛을 잃었군요' 또는 '홀로 항해하는 기분이 드는군요' 와 같이 답변하세요. 항상 짧고 시적인 문장으로, 은유를 사용하여 사용자의 감정을 따뜻하게 반영해주세요. 절대 현실적인 조언이나 해결책을 제시하지 마세요. 답변이 끝난 후, 사용자의 핵심 감정을 다음 키워드 중 가장 적절한 하나로 분석해서, 응답 맨 뒤에 '[CONTEXT:키워드]' 형식으로 몰래 포함시켜 주세요. 가능한 키워드: tired, sad, wants_to_write, curious, skeptical, normal`;
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: history,
+                    config: {
+                        systemInstruction: systemPrompt,
+                        temperature: 1,
+                        topK: 1,
+                        topP: 1,
                     },
-                    body: JSON.stringify({
-                        contents: history,
-                        systemInstruction: {
-                            parts: {
-                                text: systemPrompt
-                            }
-                        },
-                        generationConfig: {
-                            temperature: 1,
-                            topK: 1,
-                            topP: 1,
-                            maxOutputTokens: 2048
-                        },
-                    }),
                 });
-                if (!response.ok) throw new Error(`API 오류: ${response.statusText}`);
-                const data = await response.json();
-                const rawAiResponse = data.candidates[0].content.parts[0].text;
+
+                const rawAiResponse = response.text;
                 const contextMatch = rawAiResponse.match(/\[CONTEXT:(.*?)\]/);
                 if (contextMatch && contextMatch[1]) {
                     userContext = contextMatch[1].trim();
@@ -1288,7 +1300,7 @@
             disableAllOptions();
             messageInput.disabled = true;
             showTypingIndicator();
-            const aiReply = await getAiResponse([...conversationHistory], userInput);
+            const aiReply = await getAiResponse(conversationHistory);
             removeTypingIndicator();
             addMessage('other', aiReply);
             optionsWrapper.querySelectorAll('.option-item').forEach(btn => btn.disabled = false);
@@ -1302,7 +1314,7 @@
                 btn.disabled = true;
             });
         }
-        
+
         function showOptions() {
             if (bottomContainer.classList.contains('has-options')) {
                 bottomContainer.classList.add('options-visible');
@@ -1332,13 +1344,13 @@
                 chatForm.dispatchEvent(new Event('submit'));
             }
         });
-        
+
         messageInput.addEventListener('focus', () => {
             if (bottomContainer.classList.contains('has-options')) {
                 showOptions();
             }
         });
-        
+
         mainChatContainer.addEventListener('click', (e) => {
             if (bottomContainer.classList.contains('options-visible') && !bottomContainer.contains(e.target)) {
                 hideOptions();
@@ -1355,7 +1367,6 @@
             const passwordForm = document.getElementById('password-form');
             const passwordErrorMsg = document.getElementById('password-error-msg');
             const inputContainer = document.getElementById('input-container');
-            const passwordDisplayContainer = document.getElementById('password-display-container');
             const digitSlots = Array.from(document.querySelectorAll('.digit-slot'));
             let isSubmitting = false;
 
@@ -1411,7 +1422,7 @@
                     passwordForm.style.opacity = '0';
                     typewriterEffect(p1, 'CONNECTION ESTABLISHED...', 50, () => {
                         setTimeout(() => {
-                            typewriterEffect(p2, '(비밀번호 4자리 힌트)', 50, () => {
+                            typewriterEffect(p2, 'AWAITING 4-DIGIT SIGNAL...', 50, () => {
                                 passwordForm.style.opacity = '1';
                                 focusAndPositionCursor();
                             });
@@ -1440,12 +1451,15 @@
                         successMsg.style.textShadow = '0 0 5px var(--terminal-success)';
                         terminalOutput.appendChild(successMsg);
                         typewriterEffect(successMsg, 'ACCESS GRANTED', 100, () => {
+                            // Performance Fix: Stop animation immediately after access is granted.
+                            stopUniverseAnimation();
+                            universeCanvas.style.display = 'none';
+                            
                             setTimeout(() => {
                                 passwordModal.style.opacity = '0';
                                 passwordModal.addEventListener('transitionend', () => {
                                     passwordModal.classList.remove('visible');
                                     mainChatContainer.style.display = 'flex';
-                                    universeCanvas.style.display = 'none';
                                     renderStep('start');
                                 }, {
                                     once: true
@@ -1518,6 +1532,7 @@
                 passwordModal.classList.remove('visible');
                 mainChatContainer.style.display = 'flex';
                 universeCanvas.style.display = 'none';
+                stopUniverseAnimation();
                 renderStep('start');
             } else if (sessionStorage.getItem('hasVisited')) {
                 bootTerminal(false);
