@@ -35,7 +35,7 @@
         }
 
         body {
-            font-family: 'VT323', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'VT323', monospace;
             background-color: var(--body-bg);
             color: var(--text-primary);
             padding: 10px;
@@ -79,16 +79,12 @@
             background-color: var(--body-bg);
             border-bottom: 1px solid var(--border-color);
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.4em;
             font-weight: bold;
             flex-shrink: 0;
             position: relative;
             align-items: center;
             z-index: 2;
-        }
-
-        .chat-container {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
         #help-btn {
@@ -149,6 +145,7 @@
             padding: 12px 18px;
             border-radius: 18px;
             line-height: 1.6;
+            font-size: 1.1em;
         }
 
         .message.narration {
@@ -160,7 +157,7 @@
         .message.narration .message-content {
             background-color: transparent;
             color: var(--text-secondary);
-            font-size: 0.9em;
+            font-size: 1em;
             text-align: center;
             font-style: italic;
             padding: 5px 0;
@@ -186,7 +183,6 @@
             background-color: var(--body-bg);
             border: 1px solid var(--text-primary);
             color: var(--text-primary);
-            font-size: 1em;
             text-align: center;
             font-style: normal;
             padding: 12px 18px;
@@ -202,7 +198,7 @@
         .message.user.action .message-content {
             background-color: transparent;
             color: var(--text-secondary);
-            font-size: 0.9em;
+            font-size: 1em;
             text-align: center;
             font-style: italic;
             padding: 5px 0;
@@ -232,36 +228,56 @@
         }
 
         .options-wrapper {
-            display: flex;
-            flex-wrap: wrap;
+            display: none;
+            flex-direction: column;
             gap: 8px;
-            justify-content: center;
-            padding: 12px 15px 8px;
+            align-items: flex-start;
+            padding: 12px 25px 8px;
         }
 
-        .option-btn {
-            background-color: var(--input-bg);
-            border: 1px solid transparent;
-            color: var(--text-primary);
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-size: 0.95em;
+        .option-item {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            font: inherit;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            font-size: 1.1em;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: color 0.2s ease, transform 0.1s ease;
+            text-align: left;
+            width: 100%;
         }
 
-        .option-btn:hover {
-            background-color: #505050;
+        .option-item:hover {
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+        
+        .option-item::before {
+            content: '> ';
+            display: inline-block;
+            opacity: 0.5;
         }
 
-        .option-btn:active {
-            transform: scale(0.97);
+        .option-item:hover::before {
+            opacity: 1;
         }
 
-        .option-btn:disabled {
-            background-color: #333;
-            color: #777;
+        .option-item:active {
+            transform: translateX(4px) scale(0.98);
+        }
+
+        .option-item:disabled {
+            color: #555;
             cursor: not-allowed;
+            pointer-events: none;
+            transform: none;
+        }
+
+        .option-item:disabled::before {
+            opacity: 0.3;
         }
 
         .chat-input-form {
@@ -287,7 +303,7 @@
             border: none;
             background-color: var(--input-bg);
             color: var(--text-primary);
-            font-size: 1em;
+            font-size: 1.1em;
             font-family: inherit;
             resize: none;
             overflow-y: auto;
@@ -338,6 +354,10 @@
             width: 18px;
             height: 18px;
             flex-shrink: 0;
+        }
+        
+        .chat-bottom-container.options-visible .options-wrapper {
+            display: flex;
         }
 
         .typing-indicator {
@@ -411,6 +431,7 @@
             max-height: 85vh;
             overflow-y: auto;
             box-sizing: border-box;
+            font-size: 1.1em;
         }
 
         .modal-content h2 {
@@ -1031,7 +1052,7 @@
             messageInput.style.height = `${newHeight}px`;
             const bottomHeight = bottomContainer.offsetHeight;
             document.documentElement.style.setProperty('--dynamic-bottom-height', `${bottomHeight + 20}px`);
-            sendBtn.classList.toggle('visible', messageInput.value.trim().length > 0);
+            sendBtn.classList.toggle('visible', messageInput.value.trim().length > 0 && !messageInput.readOnly);
             scrollToBottom();
         }
 
@@ -1077,26 +1098,43 @@
                 if (i < messageQueue.length - 1) await sleep(MESSAGE_DELAY);
             }
             optionsWrapper.innerHTML = '';
+            bottomContainer.classList.remove('has-options', 'options-visible');
+
             if (stepData.isEnd) {
                 await sleep(MESSAGE_DELAY);
                 await renderStep('conclusion');
             } else if (stepData.options) {
+                bottomContainer.classList.add('has-options');
+                messageInput.placeholder = '당신의 이야기를 들려주세요...';
+                messageInput.readOnly = false;
                 Object.entries(stepData.options).forEach(([optionKey, optionData]) => {
                     const button = document.createElement('button');
-                    button.className = 'option-btn';
+                    button.className = 'option-item';
                     button.innerText = optionData.text;
-                    button.onclick = () => handleOptionClick(optionKey);
+                    button.onclick = (event) => handleOptionClick(optionKey, event.currentTarget);
                     optionsWrapper.appendChild(button);
                 });
+            } else {
+                messageInput.placeholder = '당신의 이야기를 들려주세요...';
+                messageInput.readOnly = false;
             }
             updateLayout();
         }
 
-        function handleOptionClick(chosenOptionKey) {
+        function handleOptionClick(chosenOptionKey, selectedButton) {
             const currentNodeData = conversationTree[currentStepKey];
             if (!currentNodeData || !currentNodeData.options || !currentNodeData.options[chosenOptionKey]) {
                 return;
             }
+
+            if (selectedButton) {
+                optionsWrapper.querySelectorAll('.option-item').forEach(btn => {
+                    if (btn !== selectedButton) {
+                        btn.style.display = 'none';
+                    }
+                });
+            }
+
             const optionData = currentNodeData.options[chosenOptionKey];
             renderStep(optionData.defaultNext);
         }
@@ -1157,16 +1195,31 @@
             const aiReply = await getAiResponse([...conversationHistory], userInput);
             removeTypingIndicator();
             addMessage('other', aiReply);
-            optionsWrapper.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
+            optionsWrapper.querySelectorAll('.option-item').forEach(btn => btn.disabled = false);
             messageInput.disabled = false;
             messageInput.focus();
             updateLayout();
         }
 
         function disableAllOptions() {
-            optionsWrapper.querySelectorAll('.option-btn').forEach(btn => {
+            optionsWrapper.querySelectorAll('.option-item').forEach(btn => {
                 btn.disabled = true;
             });
+        }
+        
+        function showOptions() {
+            if (bottomContainer.classList.contains('has-options')) {
+                bottomContainer.classList.add('options-visible');
+                updateLayout();
+            }
+        }
+
+        function hideOptions() {
+            if (bottomContainer.classList.contains('options-visible')) {
+                bottomContainer.classList.remove('options-visible');
+                messageInput.blur();
+                updateLayout();
+            }
         }
 
         chatForm.addEventListener('submit', (e) => {
@@ -1183,6 +1236,19 @@
                 chatForm.dispatchEvent(new Event('submit'));
             }
         });
+        
+        messageInput.addEventListener('focus', () => {
+            if (bottomContainer.classList.contains('has-options')) {
+                showOptions();
+            }
+        });
+        
+        mainChatContainer.addEventListener('click', (e) => {
+            if (bottomContainer.classList.contains('options-visible') && !bottomContainer.contains(e.target)) {
+                hideOptions();
+            }
+        });
+
 
         window.onload = () => {
             const passwordModal = document.getElementById('password-modal');
@@ -1210,12 +1276,10 @@
                 if (nextSlotIndex < digitSlots.length) {
                     const nextSlot = digitSlots[nextSlotIndex];
                     const slotRect = nextSlot.getBoundingClientRect();
-                    // Center the cursor in the next available slot.
                     cursorX = (slotRect.left - containerRect.left) + (slotRect.width / 2) - (cursor.offsetWidth / 2);
                 } else {
                     const lastSlot = digitSlots[digitSlots.length - 1];
                     const slotRect = lastSlot.getBoundingClientRect();
-                    // Position it just after the last slot if full.
                     cursorX = slotRect.right - containerRect.left;
                 }
                 cursor.style.left = `${cursorX}px`;
@@ -1316,6 +1380,8 @@
                 e.preventDefault();
                 handlePasswordSubmit();
             });
+
+
 
             passwordInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.keyCode === 13) {
