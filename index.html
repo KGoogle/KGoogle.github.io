@@ -507,28 +507,10 @@
             display: block;
         }
 
-        .password-underlines {
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            pointer-events: none;
-        }
-
-        .password-underlines span {
-            width: 1ch;
-            height: 2px;
-            background-color: var(--terminal-text);
-            opacity: 0.4;
-        }
-
         #password-label {
             display: flex;
             align-items: center;
             width: 100%;
-            cursor: text;
         }
 
         #password-form .prompt {
@@ -537,35 +519,42 @@
 
         #input-container {
             position: relative;
-            display: inline-block;
+            padding: 1em 0;
+            cursor: text;
+            flex-grow: 1;
         }
 
-        #password-ruler,
+        #password-display-container {
+            display: flex;
+            gap: 0.8em;
+            align-items: center;
+            font-size: 1.5em;
+        }
+
+        .digit-slot {
+            width: 1ch;
+            line-height: 1.5;
+            text-align: center;
+            color: var(--terminal-text);
+            border-bottom: 2px solid var(--terminal-text);
+            min-height: 1.5em;
+        }
+
         #password-input {
-            font-family: inherit;
-            font-size: inherit;
-            letter-spacing: 0.3em;
-            text-shadow: inherit;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: transparent;
+            caret-color: transparent;
             padding: 0;
             margin: 0;
-            border: 0;
-            vertical-align: top;
-            box-sizing: content-box;
-        }
-
-        #password-ruler {
-            position: absolute;
-            visibility: hidden;
-            white-space: pre;
-        }
-
-        #password-input {
-            background: transparent;
-            color: var(--terminal-text);
-            width: calc(4ch + 3 * 0.3em);
-            caret-color: transparent;
             -webkit-text-security: disc;
             text-security: disc;
+            font-size: 1px;
         }
 
         #password-input:focus {
@@ -574,14 +563,15 @@
 
         #password-form #cursor {
             position: absolute;
-            top: 0;
-            left: 0;
-            display: inline-block;
-            background-color: var(--terminal-text);
+            top: 50%;
             width: 0.6em;
             height: 1.2em;
+            transform: translateY(-50%);
+            background-color: var(--terminal-text);
             animation: blink 1s step-end infinite;
-            transition: left 0.05s ease-out;
+            transition: left 0.1s ease-out;
+            pointer-events: none;
+            display: none;
         }
 
         #password-error-msg {
@@ -640,14 +630,13 @@
                     <label for="password-input" id="password-label">
                         <span class="prompt">></span>
                         <div id="input-container">
-                            <span id="password-ruler"></span>
-                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
-                            <div class="password-underlines">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
+                            <div id="password-display-container">
+                                <div class="digit-slot"></div>
+                                <div class="digit-slot"></div>
+                                <div class="digit-slot"></div>
+                                <div class="digit-slot"></div>
                             </div>
+                            <input type="text" id="password-input" maxlength="4" autocomplete="off" inputmode="numeric" pattern="[0-9]*">
                             <span id="cursor"></span>
                         </div>
                     </label>
@@ -1200,18 +1189,41 @@
             const terminalOutput = document.getElementById('terminal-output');
             const terminalInfo = document.getElementById('terminal-info');
             const cursor = document.getElementById('cursor');
-            const ruler = document.getElementById('password-ruler');
             const passwordInput = document.getElementById('password-input');
             const passwordForm = document.getElementById('password-form');
             const passwordErrorMsg = document.getElementById('password-error-msg');
+            const inputContainer = document.getElementById('input-container');
+            const passwordDisplayContainer = document.getElementById('password-display-container');
+            const digitSlots = Array.from(document.querySelectorAll('.digit-slot'));
             let isSubmitting = false;
 
-            const updatePasswordCursorPosition = () => {
-                setTimeout(() => {
-                    ruler.textContent = passwordInput.value;
-                    cursor.style.left = `${ruler.offsetWidth}px`;
-                }, 0);
+            const updatePasswordDisplay = () => {
+                const value = passwordInput.value;
+                digitSlots.forEach((slot, index) => {
+                    slot.textContent = index < value.length ? '•' : '';
+                });
+
+                const containerRect = inputContainer.getBoundingClientRect();
+                const nextSlotIndex = value.length;
+                let cursorX;
+
+                if (nextSlotIndex < digitSlots.length) {
+                    const nextSlot = digitSlots[nextSlotIndex];
+                    const slotRect = nextSlot.getBoundingClientRect();
+                    // Center the cursor in the next available slot.
+                    cursorX = (slotRect.left - containerRect.left) + (slotRect.width / 2) - (cursor.offsetWidth / 2);
+                } else {
+                    const lastSlot = digitSlots[digitSlots.length - 1];
+                    const slotRect = lastSlot.getBoundingClientRect();
+                    // Position it just after the last slot if full.
+                    cursorX = slotRect.right - containerRect.left;
+                }
+                cursor.style.left = `${cursorX}px`;
             };
+
+            inputContainer.addEventListener('click', () => {
+                passwordInput.focus();
+            });
 
             const typewriterEffect = (element, text, delay = 50, callback) => {
                 let i = 0;
@@ -1230,7 +1242,6 @@
             const bootTerminal = (withAnimation) => {
                 const focusAndPositionCursor = () => {
                     passwordInput.focus();
-                    updatePasswordCursorPosition();
                 };
                 if (withAnimation) {
                     const p1 = terminalInfo.querySelector('p:first-child');
@@ -1285,7 +1296,7 @@
                 } else {
                     passwordErrorMsg.textContent = 'ACCESS DENIED';
                     passwordInput.value = '';
-                    updatePasswordCursorPosition();
+                    updatePasswordDisplay();
                     passwordInput.focus();
                     setTimeout(() => {
                         passwordErrorMsg.textContent = '';
@@ -1294,7 +1305,7 @@
             };
 
             passwordInput.addEventListener('input', () => {
-                updatePasswordCursorPosition();
+                updatePasswordDisplay();
                 passwordErrorMsg.textContent = '';
                 if (passwordInput.value.length === 4) {
                     handlePasswordSubmit();
@@ -1315,11 +1326,13 @@
 
             passwordInput.addEventListener('focus', () => {
                 isSubmitting = false;
+                cursor.style.display = 'inline-block';
                 cursor.style.animation = 'blink 1s step-end infinite';
-                updatePasswordCursorPosition();
+                setTimeout(updatePasswordDisplay, 0);
             });
 
             passwordInput.addEventListener('blur', () => {
+                cursor.style.display = 'none';
                 cursor.style.animation = 'none';
             });
 
