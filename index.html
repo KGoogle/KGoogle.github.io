@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -794,7 +795,10 @@
             'start': {
                 response: [{
                     type: 'question',
-                    content: "깊고 고요한 우주, 저 멀리서 무엇인지 모를 빛 하나가 당신을 향해 깜빡입니다. 어떤 길을 갈까요?"
+                    content: "깊고 고요한 우주, 저 멀리서 무엇인지 모를 빛 하나가 당신을 향해 깜빡입니다."
+                }, {
+                    type: 'question',
+                    content: "어떤 길을 갈까요?"
                 }],
                 options: {
                     'approach_light': {
@@ -818,7 +822,10 @@
                     content: '가까워진 빛이 조용히 속삭입니다.'
                 }, {
                     type: 'other',
-                    content: '"나를 찾아와줘서 고마워. 나랑 함께하지 않을래?"'
+                    content: '나를 찾아와줘서 고마워.'
+                }, {
+                    type: 'other',
+                    content: '나랑 함께하지 않을래?'
                 }],
                 options: {
                     'accept_light': {
@@ -839,10 +846,16 @@
                 userAction: "당신은 손을 뻗어, 그 빛을 온전히 당신의 것으로 만들었습니다.",
                 response: [{
                     type: 'narration',
-                    content: "빛은 부드럽게 당신의 안으로 스며듭니다. 용기 내어 붙잡은 빛은 당신의 일부가 되어 당신의 우주를 더욱 환하게 밝힙니다."
+                    content: "빛은 부드럽게 당신의 안으로 스며듭니다."
+                }, {
+                    type: 'narration',
+                    content: "용기 내어 붙잡은 빛은 당신의 일부가 되어 당신의 우주를 더욱 환하게 밝힙니다."
                 }, {
                     type: 'question',
-                    content: "빛에게서 메시지가 도착했습니다. 읽어보시겠습니까?"
+                    content: "빛에게서 메시지가 도착했습니다."
+                }, {
+                    type: 'question',
+                    content: "읽어보시겠습니까?"
                 }],
                 options: {
                     'read_message': {
@@ -859,46 +872,81 @@
                 userAction: "당신은 빛이 남긴 메시지를 펼쳐보았습니다.",
                 response: [{
                     type: 'other',
-                    content: "내가 필요할 때면 언제든 차단 풀어줘, 내가 곁에 있을게"
+                    content: "내가 필요할 때면 언제든 차단 풀어줘,"
+                }, {
+                    type: 'other',
+                    content: "내가 곁에 있을게"
+                }, {
+                    type: 'question',
+                    content: "어디까지나 선택은 당신의 몫입니다."
+                }, {
+                    type: 'question',
+                    content: "빛은 당신의 선택을 존중합니다."
                 }],
-                isEnd: true,
-                conclusion: "어디까지나 선택은 당신의 몫입니다. 빛은 당신의 선택을 존중합니다."
+                isEnd: true
             },
             'save_message': {
                 userAction: "당신은 지금 메시지를 읽지 않고, 덮어두기로 했습니다.",
                 response: [{
                     type: 'narration',
                     content: "메시지는 얌전히 봉인된 채 당신이 원할 때 언제든 다시 펼쳐볼 수 있도록 기다립니다."
+                }, {
+                    type: 'question',
+                    content: "모든 것을 알 필요는 없습니다."
+                }, {
+                    type: 'question',
+                    content: "당신의 방향에 맞춰 이야기를 마주하는 것, 그것이 바로 당신만의 항해입니다."
                 }],
-                isEnd: true,
-                conclusion: "모든 것을 알 필요는 없습니다. 당신의 방향에 맞춰 이야기를 마주하는 것, 그것이 바로 당신만의 항해입니다."
+                isEnd: true
             },
             'approach_friendship': {
                 userAction: "당신은 더 다가가지 않고, 그 자리에서 당신만의 빛을 보냈습니다.",
                 response: [{
                     type: 'narration',
-                    content: "당신의 신호에 빛이 화답합니다. 빛도 거리를 유지하며, 마치 오랜 친구처럼 당신의 곁에서 나란히 빛나기 시작합니다."
+                    content: "당신의 신호에 빛이 화답합니다."
+                }, {
+                    type: 'narration',
+                    content: "빛도 거리를 유지하며, 마치 오랜 친구처럼 당신의 곁에서 나란히 빛나기 시작합니다."
+                }, {
+                    type: 'question',
+                    content: "모든 빛이 하나로 합쳐져야만 빛나는 것은 아닙니다."
+                }, {
+                    type: 'question',
+                    content: "서로의 길을 비춰주는 빛으로서, 당신은 가장 편안하고 든든한 동료를 얻었습니다."
                 }],
-                isEnd: true,
-                conclusion: "모든 빛이 하나로 합쳐져야만 빛나는 것은 아닙니다. 서로의 길을 비춰주는 빛으로서, 당신은 가장 편안하고 든든한 동료를 얻었습니다."
+                isEnd: true
             },
             'turn_back_from_light': {
                 userAction: "당신은 아무 말 없이, 묵묵히 왔던 길을 돌아섰습니다.",
                 response: [{
                     type: 'narration',
-                    content: "빛이 슬픈 듯 한번 깜빡이지만, 당신을 따라오지는 않습니다. 대신 당신이 돌아가는 길이 어둡지 않도록 멀리서 비춰줍니다."
+                    content: "빛이 슬픈 듯 한번 깜빡이지만, 당신을 따라오지는 않습니다."
+                }, {
+                    type: 'narration',
+                    content: "대신 당신이 돌아가는 길이 어둡지 않도록 멀리서 비춰줍니다."
+                }, {
+                    type: 'question',
+                    content: "때로는 돌아서는 것이 더 좋은 길을 찾는 방법입니다."
+                }, {
+                    type: 'question',
+                    content: "당신의 선택은 존중받아 마땅합니다."
                 }],
-                isEnd: true,
-                conclusion: "때로는 돌아서는 것이 더 좋은 길을 찾는 방법입니다. 당신의 선택은 존중받아 마땅합니다."
+                isEnd: true
             },
             'observe_light': {
                 userAction: "당신은 그 자리에 멈춰, 빛이 보내는 신호를 가만히 지켜보았습니다.",
                 response: [{
                     type: 'narration',
-                    content: "빛은 당신을 재촉하지 않습니다. 빛도 당신을 지켜봅니다."
+                    content: "빛은 당신을 재촉하지 않습니다."
+                }, {
+                    type: 'narration',
+                    content: "빛도 당신을 지켜봅니다."
                 }, {
                     type: 'other',
-                    content: '"네가 어떤 선택을 하든 괜찮아. 나는 언제나 이 자리에 있어."'
+                    content: '네가 어떤 선택을 하든 괜찮아.'
+                }, {
+                    type: 'other',
+                    content: '나는 언제나 이 자리에 있어.'
                 }],
                 options: {
                     'observe_undecided': {
@@ -919,28 +967,49 @@
                 userAction: "당신은 서두르지 않고, 조금 더 생각하기로 했습니다.",
                 response: [{
                     type: 'narration',
-                    content: "빛은 당신의 결정을 존중합니다. 그저 묵묵히 당신의 곁을 밝히며, 당신이 마음의 답을 찾을 때까지 기다려줍니다."
+                    content: "빛은 당신의 결정을 존중합니다."
+                }, {
+                    type: 'narration',
+                    content: "그저 묵묵히 당신의 곁을 밝히며, 당신이 마음의 답을 찾을 때까지 기다려줍니다."
+                }, {
+                    type: 'question',
+                    content: "때로는 결정하지 않는 것이 가장 현명한 결정입니다."
+                }, {
+                    type: 'question',
+                    content: "고요히 자신을 들여다보는 시간 속에서, 당신은 이미 성장하고 있습니다."
                 }],
-                isEnd: true,
-                conclusion: "때로는 결정하지 않는 것이 가장 현명한 결정입니다. 고요히 자신을 들여다보는 시간 속에서, 당신은 이미 성장하고 있습니다."
+                isEnd: true
             },
             'observe_self_light': {
                 userAction: "당신은 외부의 빛에 답하는 대신, 조용히 당신 내면의 빛을 밝혔습니다.",
                 response: [{
                     type: 'narration',
                     content: "당신이 스스로 빛나기 시작하자, 저 멀리 빛이 존중의 의미로 부드럽게 깜빡입니다."
+                }, {
+                    type: 'question',
+                    content: "누군가의 빛에 의지하지 않고 스스로 빛날 때, 당신은 누구보다 빛나는 존재가 됩니다."
+                }, {
+                    type: 'question',
+                    content: "당신의 빛은 그 자체로 이미 충분히 아름답습니다."
                 }],
-                isEnd: true,
-                conclusion: "누군가의 빛에 의지하지 않고 스스로 빛날 때, 당신은 누구보다 빛나는 존재가 됩니다. 당신의 빛은 그 자체로 이미 충분히 아름답습니다."
+                isEnd: true
             },
             'observe_meaning': {
                 userAction: "당신은 저 빛이 자신에게 어떤 의미인지, 깊은 생각에 잠겼습니다.",
                 response: [{
                     type: 'narration',
-                    content: "당신의 생각에 따라 빛의 색이 시시각각 변합니다. 때로는 따뜻한 노란빛으로, 때로는 차가운 푸른빛으로..."
+                    content: "당신의 생각에 따라 빛의 색이 시시각각 변합니다."
+                }, {
+                    type: 'narration',
+                    content: "때로는 따뜻한 노란빛으로, 때로는 차가운 푸른빛으로..."
+                }, {
+                    type: 'question',
+                    content: "세상의 모든 것은 우리가 의미를 부여할 때 비로소 특별해집니다."
+                }, {
+                    type: 'question',
+                    content: "당신의 우주를 해석하는 가장 중요한 열쇠는 바로 당신 자신입니다."
                 }],
-                isEnd: true,
-                conclusion: "세상의 모든 것은 우리가 의미를 부여할 때 비로소 특별해집니다. 당신의 우주를 해석하는 가장 중요한 열쇠는 바로 당신 자신입니다."
+                isEnd: true
             },
             'find_another': {
                 userAction: "당신은 새로운 길을 찾으려 주위를 둘러보았습니다.",
@@ -971,32 +1040,53 @@
                 response: [{
                     type: 'narration',
                     content: "당신이 나아가자, 그 별의 빛이 마치 길을 안내하듯 당신의 항로를 환하게 비춰줍니다."
+                }, {
+                    type: 'question',
+                    content: "익숙한 궤도를 벗어나 새로운 항로를 찾는 것은 수많은 새로운 우주를 여는 열쇠가 됩니다."
+                }, {
+                    type: 'question',
+                    content: "당신의 시선이 머무는 곳이 바로 당신의 새로운 시작입니다."
                 }],
-                isEnd: true,
-                conclusion: "익숙한 궤도를 벗어나 새로운 항로를 찾는 것은 수많은 새로운 우주를 여는 열쇠가 됩니다. 당신의 시선이 머무는 곳이 바로 당신의 새로운 시작입니다."
+                isEnd: true
             },
             'find_connection': {
                 userAction: "당신은 홀로 빛나기보다, 또 다른 누군가와 함께하기 위해 새로운 별을 찾아 떠났습니다.",
                 response: [{
                     type: 'narration',
                     content: "당신의 마음에 응답하듯, 저 멀리서 당신과 닮은 듯한 새로운 빛들이 희미하게 반짝이기 시작합니다."
+                }, {
+                    type: 'question',
+                    content: "우리는 서로의 빛을 통해 존재를 확인합니다."
+                }, {
+                    type: 'question',
+                    content: "새로운 만남을 향해 나아가는 당신의 여정은, 그 자체로 우주를 더욱 풍요롭게 만듭니다."
                 }],
-                isEnd: true,
-                conclusion: "우리는 서로의 빛을 통해 존재를 확인합니다. 새로운 만남을 향해 나아가는 당신의 여정은, 그 자체로 우주를 더욱 풍요롭게 만듭니다."
+                isEnd: true
             },
             'find_freedom': {
                 userAction: "당신은 목적지를 정하지 않고, 자유롭게 별들 사이를 유영하기 시작했습니다.",
                 response: [{
                     type: 'narration',
-                    content: "광활한 우주가 당신을 환영합니다. 수많은 별들이 당신의 여정에 빛을 비춥니다."
+                    content: "광활한 우주가 당신을 환영합니다."
+                }, {
+                    type: 'narration',
+                    content: "수많은 별들이 당신의 여정에 빛을 비춥니다."
+                }, {
+                    type: 'question',
+                    content: "때로는 목적지 없는 항해가 가장 위대한 발견으로 이어집니다."
+                }, {
+                    type: 'question',
+                    content: "길을 잃는 것이 아니라, 비로소 당신만의 지도를 그려나가는 것입니다."
                 }],
-                isEnd: true,
-                conclusion: "때로는 목적지 없는 항해가 가장 위대한 발견으로 이어집니다. 길을 잃는 것이 아니라, 비로소 당신만의 지도를 그려나가는 것입니다."
+                isEnd: true
             },
             'conclusion': {
                 response: [{
                     type: 'question',
-                    content: "이것은 결말이 아닌, 새로운 이야기의 첫 페이지입니다. 당신의 모든 선택은 그 자체로 의미 있는 항해였으며, 언제든 다시 새로운 항해를 시작할 수 있습니다."
+                    content: "이것은 결말이 아닌, 새로운 이야기의 첫 페이지입니다."
+                }, {
+                    type: 'question',
+                    content: "당신의 모든 선택은 그 자체로 의미 있는 항해였으며, 언제든 다시 새로운 항해를 시작할 수 있습니다."
                 }],
                 options: {
                     'restart': {
@@ -1108,21 +1198,24 @@
             if (stepData.isEnd) {
                 await sleep(MESSAGE_DELAY);
                 await renderStep('conclusion');
-            } else if (stepData.options) {
-                bottomContainer.classList.add('has-options');
-                messageInput.placeholder = '당신의 이야기를 들려주세요...';
-                messageInput.readOnly = false;
-                Object.entries(stepData.options).forEach(([optionKey, optionData]) => {
-                    const button = document.createElement('button');
-                    button.className = 'option-item';
-                    button.innerText = optionData.text;
-                    button.onclick = (event) => handleOptionClick(optionKey, event.currentTarget);
-                    optionsWrapper.appendChild(button);
-                });
             } else {
                 messageInput.placeholder = '당신의 이야기를 들려주세요...';
                 messageInput.readOnly = false;
+                
+                if (stepData.options) {
+                    bottomContainer.classList.add('has-options');
+                    Object.entries(stepData.options).forEach(([optionKey, optionData]) => {
+                        const button = document.createElement('button');
+                        button.className = 'option-item';
+                        button.innerText = optionData.text;
+                        button.onclick = (event) => handleOptionClick(optionKey, event.currentTarget);
+                        optionsWrapper.appendChild(button);
+                    });
+                }
+                
+                messageInput.focus();
             }
+            
             updateLayout();
         }
 
