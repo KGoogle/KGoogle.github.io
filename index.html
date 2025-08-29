@@ -656,7 +656,7 @@
             <div id="terminal-output">
                 <div id="terminal-info">
                     <p>CONNECTION ESTABLISHED...</p>
-                    <p>AWAITING 4-DIGIT SIGNAL...</p>
+                    <p>(비밀번호 힌트)</p>
                 </div>
                 <form id="password-form" action="javascript:void(0);" novalidate>
                     <label for="password-input" id="password-label">
@@ -688,9 +688,6 @@
                 자유롭게 길을 선택하고 이야기를 들려주세요.<br>
                 스쳐 지나가는 유성처럼, 당신의 이야기는 잠시 이곳을 비출 뿐<br>
                 어디에도 기록되거나 저장되지 않습니다.
-            </p>
-            <p class="warning">
-                <strong>⚠️ 주의:</strong> 자유롭게 입력하는 내용은 AI 서비스 제공사에 의해 사용될 수 있으니, 민감한 개인정보는 입력하지 않도록 주의해주세요.
             </p>
         </div>
     </div>
@@ -818,9 +815,6 @@
                 response: [{
                     type: 'question',
                     content: "깊고 고요한 우주, 저 멀리서 무엇인지 모를 빛 하나가 당신을 향해 깜빡입니다."
-                }, {
-                    type: 'question',
-                    content: "어떤 길을 갈까요?"
                 }],
                 options: {
                     'approach_light': {
@@ -894,7 +888,7 @@
                 userAction: "당신은 빛이 남긴 메시지를 펼쳐보았습니다.",
                 response: [{
                     type: 'other',
-                    content: "내가 필요할 때면 언제든 차단 풀어줘,"
+                    content: "내가 필요할 때면 언제든 차단 풀어줘"
                 }, {
                     type: 'other',
                     content: "내가 곁에 있을게"
@@ -1424,7 +1418,7 @@
                     passwordForm.style.opacity = '0';
                     typewriterEffect(p1, 'CONNECTION ESTABLISHED...', 50, () => {
                         setTimeout(() => {
-                            typewriterEffect(p2, 'AWAITING 4-DIGIT SIGNAL...', 50, () => {
+                            typewriterEffect(p2, '(비밀번호 힌트)', 50, () => {
                                 passwordForm.style.opacity = '1';
                                 focusAndPositionCursor();
                             });
