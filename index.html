@@ -608,8 +608,55 @@
             font-size: 1em;
         }
 
-        #password-error-msg:not(:empty)::before {
-            content: '> ';
+        @media (max-width: 600px) {
+            .chat-header {
+                font-size: 1.2em;
+                padding: 12px 15px;
+            }
+
+            .message-content {
+                font-size: 1em;
+                padding: 10px 15px;
+            }
+
+            .message.narration .message-content,
+            .message.user.action .message-content {
+                font-size: 0.9em;
+            }
+
+            .option-item {
+                font-size: 1em;
+            }
+
+            #message-input {
+                font-size: 1em;
+                min-height: 36px;
+                padding: 8px 45px 8px 15px;
+            }
+            
+            #send-btn {
+                right: 8px;
+                width: 28px;
+                height: 28px;
+            }
+            
+            #send-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .modal-content {
+                font-size: 1em;
+                padding: 20px;
+            }
+
+            .modal-content h2 {
+                font-size: 1.3em;
+            }
+
+            #password-modal .modal-content {
+                font-size: 1em;
+            }
         }
     </style>
 <script type="importmap">
