@@ -627,7 +627,7 @@
     <div id="main-chat-container" class="chat-container">
         <div class="chat-header">
             <span>프롤로그</span>
-            <button id="help-btn" title="도움말">
+            <button id="message-btn" title="전하는 말">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z" />
@@ -684,7 +684,7 @@
             <span class="close-btn">×</span>
             <h2>전하는 말</h2>
             <p>
-                글들을 볼 때마다 수정하고 싶은데 그러면 평생 못 만들 거 같더라고 아쉽지만 내 생각을 보여주는 게 우선이라 생각해서 만들었어 어떤 정보도 저장되거나 보이는 일은 없으니까 편하게 선택해도 괜찮아 사실 또 다른 오해가 생기진 않을까 아니면 아예 안 보진 않을까 두렵기는 한데 그래도 꼭 필요한 일이라 생각해서 용기 내볼게!
+                글들을 볼 때마다 수정하고 싶은데 그러면 평생 못 만들 거 같더라고 아쉽지만 내 생각을 보여주는 게 우선이라 생각해서 만들었어 어떤 정보도 저장되거나 보이는 일은 없으니까 편하게 선택해도 괜찮아 사실 또 다른 오해가 생기진 않을까 아니면 아예 안 보진 않을까 두렵기는 한데 그래도 꼭 필요한 일이라 생각해서<br>용기 내볼게!
             </p>
         </div>
     </div>
@@ -885,7 +885,7 @@
                 userAction: "당신은 빛이 남긴 메시지를 펼쳐보았습니다.",
                 response: [{
                     type: 'other',
-                    content: "내가 잘못한 것들이 많지만 근본적인 문제에 대해 얘기해 보려고 해\n\n내가 가장 싫어하는 것 중 하나가 내 인생의 선택권을 빼앗는 것인데 정작 너에게는 내가 그런 행동을 했더라고 내가 할 일은 너에게 선택권을 주고 너의 선택이 틀리지 않도록 노력하는 거였는데 내가 잘못 생각하고 있었어 이제는 너의 선택을 가로막지 않으려고 해\n\n지금 내가 섣불리 다가가지 못하는 건 단순히 확신이 없어서가 아니야 네가 필요한 사람이 나인 걸 모르는 상태에서 내가 무언가 행동하는 것이 너에겐 또 다른 잘못이 될까 두렵고 그렇다고 아무것도 하지 않고 가만히 있는 것조차 너를 외면하는 무책임한 행동이 될까 봐 무서워\n\n그러니까 내가 필요할 때면 나라는 걸 알 수 있는 신호를 보내줘 차단을 푸는 것도 좋고 어떤 방법이든 괜찮아 언제든지 내가 먼저 다가갈게"
+                    content: "내가 잘못한 것들이 많지만 시작점에 대해 얘기해 보려고 해\n\n내가 가장 싫어하는 것 중 하나가 내 인생의 선택권을 빼앗는 것인데 정작 너에게는 내가 그런 행동을 했더라고 내가 할 일은 너에게 선택권을 주고 너의 선택이 틀리지 않도록 노력하는 거였는데 내가 잘못 생각하고 있었어 이제는 너의 선택을 가로막지 않으려고 해\n\n지금 내가 섣불리 다가가지 못하는 건 단순히 확신이 없어서가 아니야 네가 필요한 사람이 나인 걸 모르는 상태에서 내가 무언가 행동하는 것이 너에겐 또 다른 잘못이 될까 두렵고 그렇다고 아무것도 하지 않고 가만히 있는 것조차 너를 외면하는 무책임한 행동이 될까 봐 무서워\n\n그러니까 내가 필요할 때면 나라는 걸 알 수 있는 신호를 보내줘 차단을 푸는 것도 좋고 어떤 방법이든 괜찮아 언제든지 내가 먼저 다가갈게"
                 }, {
                     type: 'question',
                     content: "어디까지나 선택은 당신의 몫입니다."
@@ -1457,6 +1457,7 @@
                                 passwordModal.style.opacity = '0';
                                 passwordModal.addEventListener('transitionend', () => {
                                     passwordModal.classList.remove('visible');
+                                    startChat();
                                     helpModal.classList.add('visible');
                                 }, {
                                     once: true
@@ -1517,7 +1518,6 @@
                 helpModal.classList.remove('visible');
                 if (sessionStorage.getItem('isAuthenticated') && !sessionStorage.getItem('hasSeenMessage')) {
                     sessionStorage.setItem('hasSeenMessage', 'true');
-                    startChat();
                 }
             };
 
@@ -1533,9 +1533,8 @@
 
             if (sessionStorage.getItem('isAuthenticated')) {
                 passwordModal.classList.remove('visible');
-                if (sessionStorage.getItem('hasSeenMessage')) {
-                    startChat();
-                } else {
+                startChat();
+                if (!sessionStorage.getItem('hasSeenMessage')) {
                     helpModal.classList.add('visible');
                 }
             } else if (sessionStorage.getItem('hasVisited')) {
