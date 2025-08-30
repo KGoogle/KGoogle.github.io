@@ -682,12 +682,9 @@
     <div id="help-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">×</span>
-            <h2>도움말</h2>
+            <h2>전하는 말</h2>
             <p>
-                이곳은 온전히 당신만의 공간입니다.<br>
-                자유롭게 길을 선택하고 이야기를 들려주세요.<br>
-                스쳐 지나가는 유성처럼, 당신의 이야기는 잠시 이곳을 비출 뿐<br>
-                어디에도 기록되거나 저장되지 않습니다.
+                글들을 볼 때마다 수정하고 싶은데 그러면 평생 못 만들 거 같더라고 아쉽지만 내 생각을 보여주는 게 우선이라 생각해서 만들었어 어떤 정보도 저장되거나 보이는 일은 없으니까 편하게 선택해도 괜찮아 사실 또 다른 오해가 생기진 않을까 아니면 아예 안 보진 않을까 두렵기는 한데 그래도 꼭 필요한 일이라 생각해서 용기 내볼게!
             </p>
         </div>
     </div>
@@ -832,13 +829,13 @@
                 }
             },
             'approach_light': {
-                userAction: "당신은 미지의 빛을 향해, 조심스럽게 항해를 시작했습니다.",
+                userAction: "당신은 미지의 빛을 향해, 조심스럽게 다가갑니다.",
                 response: [{
                     type: 'narration',
                     content: '가까워진 빛이 조용히 속삭입니다.'
                 }, {
                     type: 'other',
-                    content: '나를 찾아와줘서 고마워.'
+                    content: '나를 찾아와줘서 고마워'
                 }, {
                     type: 'other',
                     content: '나랑 함께하지 않을래?'
@@ -888,10 +885,7 @@
                 userAction: "당신은 빛이 남긴 메시지를 펼쳐보았습니다.",
                 response: [{
                     type: 'other',
-                    content: "내가 필요할 때면 언제든 차단 풀어줘"
-                }, {
-                    type: 'other',
-                    content: "내가 곁에 있을게"
+                    content: "내가 잘못한 것들이 많지만 근본적인 문제에 대해 얘기해 보려고 해\n\n내가 가장 싫어하는 것 중 하나가 내 인생의 선택권을 빼앗는 것인데 정작 너에게는 내가 그런 행동을 했더라고 내가 할 일은 너에게 선택권을 주고 너의 선택이 틀리지 않도록 노력하는 거였는데 내가 잘못 생각하고 있었어 이제는 너의 선택을 가로막지 않으려고 해\n\n지금 내가 섣불리 다가가지 못하는 건 단순히 확신이 없어서가 아니야 네가 필요한 사람이 나인 걸 모르는 상태에서 내가 무언가 행동하는 것이 너에겐 또 다른 잘못이 될까 두렵고 그렇다고 아무것도 하지 않고 가만히 있는 것조차 너를 외면하는 무책임한 행동이 될까 봐 무서워\n\n그러니까 내가 필요할 때면 나라는 걸 알 수 있는 신호를 보내줘 차단을 푸는 것도 좋고 어떤 방법이든 괜찮아 언제든지 내가 먼저 다가갈게"
                 }, {
                     type: 'question',
                     content: "어디까지나 선택은 당신의 몫입니다."
@@ -899,7 +893,12 @@
                     type: 'question',
                     content: "빛은 당신의 선택을 존중합니다."
                 }],
-                isEnd: true
+                options: {
+                    'restart': {
+                        text: '다시, 첫 페이지를 시작하기',
+                        defaultNext: 'start'
+                    }
+                }
             },
             'save_message': {
                 userAction: "당신은 지금 메시지를 읽지 않고, 덮어두기로 했습니다.",
@@ -911,7 +910,7 @@
                     content: "모든 것을 알 필요는 없습니다."
                 }, {
                     type: 'question',
-                    content: "당신의 방향에 맞춰 이야기를 마주하는 것, 그것이 바로 당신만의 항해입니다."
+                    content: "당신의 방향에 맞춰 이야기를 마주하는 것, 그것이 바로 당신만의 길입니다."
                 }],
                 isEnd: true
             },
@@ -959,10 +958,10 @@
                     content: "빛도 당신을 지켜봅니다."
                 }, {
                     type: 'other',
-                    content: '네가 어떤 선택을 하든 괜찮아.'
+                    content: '네가 어떤 선택을 하든 괜찮아'
                 }, {
                     type: 'other',
-                    content: '나는 언제나 이 자리에 있어.'
+                    content: '나는 언제나 이 자리에 있어'
                 }],
                 options: {
                     'observe_undecided': {
@@ -1052,7 +1051,7 @@
                 }
             },
             'find_dream': {
-                userAction: "당신은 자신만의 별을 향해 항해를 시작했습니다.",
+                userAction: "당신은 자신만의 별을 향해 다가갔습니다.",
                 response: [{
                     type: 'narration',
                     content: "당신이 나아가자, 그 별의 빛이 마치 길을 안내하듯 당신의 항로를 환하게 비춰줍니다."
@@ -1089,7 +1088,7 @@
                     content: "수많은 별들이 당신의 여정에 빛을 비춥니다."
                 }, {
                     type: 'question',
-                    content: "때로는 목적지 없는 항해가 가장 위대한 발견으로 이어집니다."
+                    content: "때로는 목적지 없는 여행이 가장 위대한 발견으로 이어집니다."
                 }, {
                     type: 'question',
                     content: "길을 잃는 것이 아니라, 비로소 당신만의 지도를 그려나가는 것입니다."
@@ -1102,7 +1101,7 @@
                     content: "이것은 결말이 아닌, 새로운 이야기의 첫 페이지입니다."
                 }, {
                     type: 'question',
-                    content: "당신의 모든 선택은 그 자체로 의미 있는 항해이며, 언제든 다시 새로운 항해를 시작할 수 있습니다."
+                    content: "당신의 모든 선택은 그 자체로 의미가 있으며, 언제든 다시 새로운 시작을 할 수 있습니다."
                 }],
                 options: {
                     'restart': {
@@ -1429,6 +1428,13 @@
                 }
             };
 
+            const startChat = () => {
+                stopUniverseAnimation();
+                universeCanvas.style.display = 'none';
+                mainChatContainer.style.display = 'flex';
+                renderStep('start');
+            };
+
             const handlePasswordSubmit = () => {
                 if (isSubmitting) return;
                 if (passwordInput.value === CORRECT_PASSWORD) {
@@ -1447,15 +1453,11 @@
                         successMsg.style.textShadow = '0 0 5px var(--terminal-success)';
                         terminalOutput.appendChild(successMsg);
                         typewriterEffect(successMsg, 'ACCESS GRANTED', 100, () => {
-                            stopUniverseAnimation();
-                            universeCanvas.style.display = 'none';
-                            
                             setTimeout(() => {
                                 passwordModal.style.opacity = '0';
                                 passwordModal.addEventListener('transitionend', () => {
                                     passwordModal.classList.remove('visible');
-                                    mainChatContainer.style.display = 'flex';
-                                    renderStep('start');
+                                    helpModal.classList.add('visible');
                                 }, {
                                     once: true
                                 });
@@ -1511,13 +1513,19 @@
                 helpModal.classList.add('visible');
             });
 
-            closeModalBtn.addEventListener('click', () => {
+            const closeHelpModalAction = () => {
                 helpModal.classList.remove('visible');
-            });
+                if (sessionStorage.getItem('isAuthenticated') && !sessionStorage.getItem('hasSeenMessage')) {
+                    sessionStorage.setItem('hasSeenMessage', 'true');
+                    startChat();
+                }
+            };
+
+            closeModalBtn.addEventListener('click', closeHelpModalAction);
 
             window.addEventListener('click', (event) => {
                 if (event.target == helpModal) {
-                    helpModal.classList.remove('visible');
+                    closeHelpModalAction();
                 }
             });
 
@@ -1525,10 +1533,11 @@
 
             if (sessionStorage.getItem('isAuthenticated')) {
                 passwordModal.classList.remove('visible');
-                mainChatContainer.style.display = 'flex';
-                universeCanvas.style.display = 'none';
-                stopUniverseAnimation();
-                renderStep('start');
+                if (sessionStorage.getItem('hasSeenMessage')) {
+                    startChat();
+                } else {
+                    helpModal.classList.add('visible');
+                }
             } else if (sessionStorage.getItem('hasVisited')) {
                 bootTerminal(false);
             } else {
